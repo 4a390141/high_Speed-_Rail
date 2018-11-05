@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <!--rwd重要的-->
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../all.css" type="text/css">
+    <style>
+        .wrap{
+            width: 100%;
+            max-width: 1440px;   /*在畫面1200px以下為滿版100%以上後最大等於1200px */
+            background-color: aquamarine;
+            margin: auto;
+        }
+        .item{
+            background-color: blueviolet;
+            width: 80%;      /*手機畫面為80%*/
+            margin: auto;
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: center;
+            line-height: 150px;       /*單行文字垂直置中*/
+        }
+        @media screen and (min-width:480px){
+            .wrap{
+                display: flex;      /*flex水平排版*/
+                flex-wrap: wrap;   /*子層寬度多餘一列換行*/
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+            }
+            .item{
+                width: 40%;     /*畫面大於480px小於760px 寬度變成40%*/
+                margin: 5%;     /* 100%-(40%*2)=20%    可利用空間為20%*/ 
+                                /* 2欄有margon左右左右有4邊 20%/4=5%  */
+            }
+        }
+        @media screen and (min-width:768px){
+            .wrap{ 
+                display: block;   /*將flex改為block不改也可以子層會受影響而以*/
+                overflow: hidden;   /*父層略過浮動*/
+            }
+            .item{
+                float: left;   /*畫面大於768px小於760px 寬度變成19%*/
+                width: 19%;     /*並用float排*/
+                margin: 3%;     /* 19*4為76%  100-76=24   24/8個邊為3    */
+            }
+        }
+    </style>
+    <title>first_rwd</title>
+</head>
+<body>
+    <div class="wrap">
+        <div class="item">A</div>
+        <div class="item">B</div>
+        <div class="item">C</div>
+        <div class="item">D</div>
+    </div>
+</body>
+</html>
