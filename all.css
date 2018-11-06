@@ -65,5 +65,26 @@
    /*     -webkit-box-shadow: inset 0 0 6px lightblue; */
         background-color: #1b5cb4;
     }
-    
+    @keyframes appear-460{
+        0%{
+            opacity: 1;
+        }
+        50%{
+            opacity: 0;
+        }
+        100%{
+            opacity: 1;
+        }
+    }
+    @keyframes appear-768{
+        0%{
+            opacity: 1;
+        }
+        50%{
+            opacity: 0;
+        }
+        100%{
+            opacity: 1;
+        }
+    }
 

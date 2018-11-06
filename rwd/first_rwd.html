@@ -30,18 +30,18 @@
                 align-items: center;
             }
             .item{
-                width: 40%;     /*畫面大於480px小於760px 寬度變成40%*/
-                margin: 5%;     /* 100%-(40%*2)=20%    可利用空間為20%*/ 
-                                /* 2欄有margon左右左右有4邊 20%/4=5%  */
+                width: 40%;     /*畫面大於480px寬度變成40%*/
+                margin: 5%;     
+                                
             }
         }
-        @media screen and (min-width:768px){
+        @media screen and (min-width:768px) {
             .wrap{ 
                 display: block;   /*將flex改為block不改也可以子層會受影響而以*/
                 overflow: hidden;   /*父層略過浮動*/
             }
             .item{
-                float: left;   /*畫面大於768px小於760px 寬度變成19%*/
+                float: left;   /*畫面大於768px*/
                 width: 19%;     /*並用float排*/
                 margin: 3%;     /* 19*4為76%  100-76=24   24/8個邊為3    */
             }
