@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../all.css" type="text/css">
+    <script src="../jquery-3.3.1.min.js"></script>
+    <script src="tag-js.js"></script>
+    <style>
+        ul{
+            background-color: cadetblue;
+            width: 100%;
+            padding: 5px 0;
+        }
+        li{
+            padding: 10px 0; 
+            margin: 5px auto;
+            width: 90%;
+            background-color: burlywood;
+            text-align: center;
+            
+        }
+        .content{
+            background-color: darkgreen;
+            width: 100%;
+            height: 200px;
+            position: absolute;
+            display: flex;
+            font-size: 100px;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        @media screen and (min-width:476px){
+            .wrap{
+                
+              
+            }
+            ul{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+                padding: 10px 0;
+            }
+            li{
+                width: 40%;
+            }
+
+        }
+        @media screen and (min-width:767px){
+            ul{
+                padding: 25px 0;
+            }
+            li{
+                width: 20%;
+            }
+        }
+        
+    </style>
+    <title>tag</title>
+</head>
+
+<body>
+    <div class="wrap">
+        <ul>
+            <li> link a</li>
+            <li> link b</li>
+            <li> link c</li>
+        </ul>
+        <div class="content">a</div>
+        <div class="content">b</div>
+        <div class="content">c</div>
+    </div>
+
+</body>
+
+</html>

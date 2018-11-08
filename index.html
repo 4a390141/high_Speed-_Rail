@@ -13,26 +13,34 @@
             width: 100%;
             margin: auto;
             background-color: rgba(40, 40, 40, .15);
+           
         }
-
+        ul{
+            
+            padding: 5px;
+            box-shadow: 1px 1px 1px gray;
+        }
         li {
             text-align: center;
-            margin: 5px;
-            background-color: aquamarine;
-            box-shadow: 1px 1px 1px gray;
-            padding: 20px;
-        }
-        a{
-            background-color: blue;
-            box-shadow: 2px 2px 1px gray;
-            display: block;
-            padding: 5px;
-            margin-top: 5px;
-            transition: 1s;
-        }
-        a:hover {
             
+            background-color: skyblue;
+            
+            margin: 5px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 1s;
+            width: 95%;
+            
+            padding: 20px 0;
+        }
+
+
+
+        li:hover {
+            box-shadow: 0px 0px 5px gray;
             color: white;
+            font-weight: 600;
         }
 
         footer {
@@ -43,22 +51,18 @@
             width: 100%;
             display: block;
             text-align: center;
-            position: absolute;
-            bottom: 0;
+  
         }
 
         h1 {
             display: none;
         }
 
-        p {
-            display: none;
-        }
 
 
         @media screen and (min-width:460px) {
             * {
-                animation: appear-460 .25s linear;
+                animation: appear-460 .25s linear; */
             }
 
             a,
@@ -72,15 +76,15 @@
 
             ul {
                 display: flex;
-                justify-content: center;
+                justify-content: space-around;
                 align-items: center;
                 flex-wrap: wrap;
             }
 
             ul li {
                 width: 45%;
-                margin: 2.5%;
-                height: 70px;
+                
+                
             }
         }
 
@@ -95,11 +99,10 @@
             }
 
             ul li {
-                width: 19%;
-                margin: 2%;
+                width: 22%;
+  
             }
 
-            a {}
         }
     </style>
 
@@ -110,28 +113,31 @@
     <div class="wrap">
         <h1>高鐵團</h1>
         <ul>
-            <li class="info">
-                <h2>使用區塊元素rwd</h2>
-                <p>由手機板單欄到平板雙欄到web四欄
-                    使用flex加上float來並排並使用flex-wrap來換行
-                    <a href="rwd/first_rwd.html">1 rwd初次見面</a>
-                </p>
+            <li class="first_rwd">
+                01 first rwd
             </li>
+            <li class="porridge_rwd">
+                02 porridge rwd
+            </li class="nav_rwd">
             <li>
-                <h2>三欄四欄rwd排版</h2>
-                <div>
-
-                    <p>
-                        全程使用flex排版並在尺寸改變全部ㄉ欄位寬度
-                        <a href="rwd/porridge_rwd.html">2 rwd稀飯版面</a>
-                    </p>
-                </div>
+                03 nav rwd
             </li>
-            
+            <li class="tag">
+                04 tag互換
+            </li>
+            <li class="tag">
+                    05 
+            </li>
+            <li class="full_page">
+                    06 一頁式切換
+            </li>
+            <li class="jq_ui">
+                    07 jq ui設計
+            </li>
         </ul>
     </div>
     <footer>
-        車長@勘車
+        高鐵@勘車
     </footer>
 </body>
 
