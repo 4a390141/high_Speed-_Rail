@@ -4,7 +4,10 @@ $(document).ready(function () {
     $('.porridge_rwd').attr("href", "porridge_rwd.html");
     $('.tag').attr("href", "tag.html");  */
     $('.first_rwd').click(function(){
-        window.location.assign("rwd/first_rwd.html",9000);
+        window.location.assign("rwd/first_rwd.html");
+    });
+    $('.nav').click(function(){
+        window.location.assign("jq/nav-bar.html");
     });
     $('.porridge_rwd').click(function(){
         window.location.assign("rwd/porridge_rwd.html");
