@@ -30,7 +30,8 @@
 
         .todo {
             margin: 0 auto;
-            width: 500px;
+            width: 100%;
+            max-width: 500px;
         }
 
         a.close {
@@ -60,7 +61,12 @@
             -ms-user-select: none;
             user-select: none;
         }
-
+        .fas,button{
+            cursor: pointer;
+        }
+        .fas:hover,button:hover,.far:hover{
+            transform: scale(1.15)
+        }
     </style>
 </head>
 
@@ -68,9 +74,9 @@
     <div id="app">
         <div class="form-group">
             <h1>To-Do <small>List</small></h1>
-            <form role="form">
+            <div role="form" style="display:inline-block;">
                 <input type="text" class="form-control" v-model.trim="inputValue" placeholder="Your Task" name="task">
-            </form>
+            </div>
             <button type="button" class="btn btn btn-primary" @click="createItem">Add</button>
             <!-- <button type="button" class="btn btn btn-primary" @click="readList">save</button> -->
         </div>
@@ -79,7 +85,7 @@
             <li class="" v-for="e,i in list">
                 <input type="checkbox" class="form-control" @change.stop.prevent="updateItemisComplete(e,i)"
                     :data-isComplete="e.isComplete" style="width: 8%; display: inline;" :checked="e.isComplete == 'Y'">
-                <input type="text" class="form-control" v-model="e.value" style="width: 60%; display: inline; ">
+                <input type="text" class="form-control" v-model="e.value" style="width: 60%; display: inline; " readonly="readonly">
                 <i class="fas fa-chevron-up" @click="updateItemIndex('up',i)" style="width: 8%;"></i>
                 <i class="fas fa-chevron-down" @click="updateItemIndex('down',i)" style="width: 8%;"></i>
                 <span><i class="far fa-trash-alt" @click="deleteItem(i)"></i></span>
