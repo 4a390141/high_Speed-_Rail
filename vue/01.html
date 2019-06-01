@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <watch-component></watch-component>
+    </div>
+
+
+
+    <script>
+
+        Vue.component('watch-component', {
+            template: `
+                <div>
+                    <ul>
+                        <li v-for="element,index in list" :key='element.id'>
+                            <span>{{ element.value }}</span>
+                            <button @click="updateList('up',index)">上</button>
+                            <button @click="updateList('down,index')">下</button>
+                        </li>
+                    </ul>
+                    <span>{{ status }}</span>
+                </div>        
+            `,
+            data() {
+                const self = this
+                return {
+                    list: [
+                        {
+                            id: 0,
+                            value: '第一ㄍ唷'
+                        },
+                        {
+                            id: 1,
+                            value: '第二ㄍ唷'
+                        },
+                        {
+                            id: 2,
+                            value: '第三ㄍ唷'
+                        }
+                    ],
+                    status:''
+                }
+            },
+            methods: {
+                updateList(status, index) {
+                    const self = this
+                    switch (status) {
+                        case 'up':
+                            index != '0' ?
+                                [self.list[index], self.list[index - 1]] = [self.list[index - 1], self.list[index]]
+                                : alert('不型喔')
+                            break;
+                        case 'down':
+                            index != self.list.length - 1 ?
+                                [self.list[index], self.list[index + 1]] = [self.list[index + 1], self.list[index]]
+                                : alert('不型喔')
+                            break;
+                    }
+                    
+                    console.table(self.list)
+                }
+            },
+            watch: {
+                list: function (newValue, old) {
+                    const self = this
+                    newValue !== old ? self.status = '改變ㄌ' : self.status = ''
+                }
+            },
+        })
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+
+            },
+            methods: {
+
+            }
+        })
+    </script>
+
+</body>
+
+</html>
