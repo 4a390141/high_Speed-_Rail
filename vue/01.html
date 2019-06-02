@@ -26,7 +26,7 @@
                         <li v-for="element,index in list" :key='element.id'>
                             <span>{{ element.value }}</span>
                             <button @click="updateList('up',index)">上</button>
-                            <button @click="updateList('down,index')">下</button>
+                            <button @click="updateList('down',index)">下</button>
                         </li>
                     </ul>
                     <span>{{ status }}</span>
@@ -49,25 +49,28 @@
                             value: '第三ㄍ唷'
                         }
                     ],
-                    status:''
+                    status: ''
                 }
             },
             methods: {
                 updateList(status, index) {
                     const self = this
+                    let temp = self.list[index]
                     switch (status) {
                         case 'up':
-                            index != '0' ?
-                                [self.list[index], self.list[index - 1]] = [self.list[index - 1], self.list[index]]
-                                : alert('不型喔')
+                            if (index != '0') {
+                                self.$set(self.list, index, self.list[index - 1])
+                                self.$set(self.list, index - 1, temp)
+                            }
                             break;
                         case 'down':
-                            index != self.list.length - 1 ?
-                                [self.list[index], self.list[index + 1]] = [self.list[index + 1], self.list[index]]
-                                : alert('不型喔')
+                            if (index != self.list.length - 1) {
+                                self.$set(self.list, index, self.list[index + 1])
+                                self.$set(self.list, index + 1, temp)
+                            }
                             break;
                     }
-                    
+
                     console.table(self.list)
                 }
             },
