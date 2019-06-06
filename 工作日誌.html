@@ -9,13 +9,103 @@
 </head>
 
 <body>
+
+    <!-- 雲端 我們自己資料
+    webapi 客戶端資料
+
+    資料庫 colNameMapping>主檔設定欄位 mappingID 對應到副檔ㄉ
+    oteher 跟副黨 其實是依樣 部分不同 例如盡現 登入頁
+
+    進現 搜尋欄未 為主黨所設定ㄉ
+    主黨 tenantID typeID
+    副黨 多ㄌ entitytypeID  
+    other 是typeID 多ㄌchanl-noㄉ名稱
+
+    colNameMapping 主黨table表
+    colNameSetting 副黨顯示ㄉtable表
+    setting 主黨顯示
+    webapi 主黨設定 搜尋條件 -->
+    <div>
+        <h2>06/06</h2>
+        <ul>
+            <li>
+                <span>昨日工作</span>
+                <ol>
+                    <li>#3288 工單編輯不一定生效 主要是回覆 編輯多欄會失敗問題</li>
+                    <li>進線 常用連結 關閉頁簽</li>
+                    <li>儀錶板 小組 、 小工具</li>
+                    <li>i18n 再次修正 修改舊語法 並統一</li>
+                </ol>
+            </li>
+            <li>
+                <span>本日工作</span>
+                <ol>
+                    <li>6張redmine 工單範本部分 目前有 設定頁面 </li>
+                </ol>
+            </li>
+        </ul>
+    </div>
+
+    <div>
+        <h2>06/05</h2>
+        <ul>
+            <li>
+                <span>昨日工作</span>
+                <ol>
+                    <li>#3173 自定義小組 文字統一以及補上防呆</li>
+                    <li>#3212 暫存案件重新編輯時有誤</li>
+                    <li>#3303 #3300 #3301 i18n 報表、正式訪員的儀錶板、TM</li>
+                </ol>
+            </li>
+            <li>
+                <span>本日工作</span>
+                <ol>
+                    <li>#3288 工單編輯不一定生效 主要是回覆 編輯多欄會失敗問題</li>
+                    <li>#3259 暫存單再存暫存單 之api確認 附件無參數</li>
+                </ol>
+            </li>
+        </ul>
+    </div>
+
     <div>
         <h2>06/03</h2>
         <ul>
             <li>
                 <span>昨日工作</span>
                 <ol>
-                    <li>登入頁api 早上測試 完成補上前端pt</li>
+                    <li>登入頁更改部分 功能目前測試正常補上pt 版面部分需調整?</li>
+                    <li>#3278 臭蟲 設定 儀錶板i18n問題</li>
+                </ol>
+            </li>
+            <li>
+                <span>本日工作</span>
+                <ol>
+                    <li>#3303 i18n 臭蟲報表</li>
+                    <li>#3300 i18n 臭蟲報表</li>
+                    <li>#3301 i18n 臭蟲報表</li>
+                    <li>#1943 變更密碼 密碼是否為必填?</li>
+                    <li>#3269 #3256 #3270 #3257 工單範本設定</li>
+                </ol>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <h2>06/03</h2>
+        <ul>
+            <li>
+                <span>昨日工作</span>
+                <ol>
+                    <li>登入頁api 早上測試 完成補上前端pt
+                        <ul>
+                            <li>排除別人加上自己</li>
+                            <li>MappingExt 連結客資 ExtendField01 ~ ExtendField15</li>
+                            <li>別人已選到ㄉ要消失 自己要存在 最多15個</li>
+                            <li>連結客資 預設是空 ok</li>
+                            <li>新增第一筆title自動是searchKey ok</li>
+                            <li>加一按鈕為searchKey ok</li>
+                            <li>每個頁面只會有一ㄍsearchKey ok</li>
+                        </ul>
+                    </li>
                     <li>#1943 變更分機密碼 pt完成</li>
                     <li>#3035 新安表單 修正 並後續進入頁面url bug</li>
                 </ol>
