@@ -119,8 +119,9 @@
             methods: {
                 clearList() {
                     const self = this
-                    self.list.length = 0
-                    self.$set(self.list, '', '')
+
+                    self.list = []
+                    // self.$set(self.list, '')
                 },
                 addList() {
                     const self = this
