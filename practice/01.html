@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.js"></script>
+    <style>
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: all .8s ease;
+        }
+
+        .fade-enter {
+            transform: translateX(50px);
+            opacity: 0;
+        }
+
+        .fade-leave-to {
+            transform: translateX(-50px);
+            opacity: 0;
+        }
+
+        #app {
+            margin: auto;
+            width: 70%;
+            display: flex;
+
+        }
+
+        .tab {
+            position: absolute;
+            width: 100%;
+            height: 300px;
+            top: 0;
+        }
+
+        .left {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .right {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            padding: 10px;
+        }
+        
+        .tab-c li,
+        button {
+            cursor: pointer;
+        }
+        .tab-top{
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app">
+
+        <div class="left">
+            <button @click="tabVuew = 'tab-component-a'">A</button>
+            <button @click="tabVuew = 'tab-component-b'">B</button>
+            <button @click="tabVuew = 'tab-component-c'">C</button>
+        </div>
+
+        <div class="right">
+            <transition name="fade">
+                <keep-alive>
+                    <component :is="tabVuew"></component>
+                </keep-alive>
+            </transition>
+        </div>
+
+    </div>
+
+
+
+    <script>
+        Vue.component('tab-component-a', {
+            template: `
+                <div class="tab tab-top">
+                    <input type="text" v-model="inputValue" :disabled="inputStatus">
+                    <button @click="inputStatus==='disabled'?inputStatus=fales:inputStatus='disabled'" >點擊就鎖定再點就解開</button>
+                    <button @click="inputValue = ''">點擊清空</button>
+                </div>
+            `,
+            data() {
+                return {
+                    inputValue: '你好啊',
+                    inputStatus: false
+                };
+            },
+            methods: {
+
+            },
+        })
+        Vue.component('tab-component-b', {
+            template: `
+                <div class="tab tab-top">
+                <button @click="clearList">清空空</button>
+                <button @click="addList">長大長大</button>
+                    <ul>
+                        <li v-for="element,index in list">我是第{{ parseInt(index,10)+1 }}個孩子唷~</li>
+                    </ul>
+                </div>
+            `,
+            data() {
+                return {
+                    list: []
+                }
+            },
+            methods: {
+                clearList() {
+                    const self = this
+                    self.list.length = 0
+                    self.$set(self.list, '', '')
+                },
+                addList() {
+                    const self = this
+                    self.list.push(' ')
+                },
+            }
+        });
+        Vue.component('tab-component-c', {
+            template: `
+                <div class="tab-c tab">
+                    <ul>
+                        <li v-for="element,index in list" @click.stop="changeElementColor(index)" :style="{backgroundColor:element.color}">
+                            <span>
+                                {{ element.value }}
+                            </span>
+                            <span @click.stop="changeFontColor(index)" :style="{color:element.fontColor}">改變字</span>
+                        </li>
+                    </ul>
+                </div>
+            `,
+            data() {
+                return {
+                    list: [
+                        {
+                            value: '改變整條',
+                            color: 'white'
+                        },
+                        {
+                            value: '改變整條',
+                            color: 'white'
+                        },
+                        {
+                            value: '改變整條',
+                            color: 'white'
+                        }
+                    ],
+                };
+            },
+            methods: {
+                changeElementColor(index) {
+                    const self = this
+                    self.list[index].color === 'white' ? self.list[index].color = 'blue' : self.list[index].color = 'white'
+                },
+                changeFontColor(index) {
+                    const self = this
+                    self.list[index].fontColor === 'black' ? self.list[index].fontColor = 'yellow' : self.list[index].fontColor = 'black'
+                }
+            },
+            mounted() {
+                const self = this
+                self.list.forEach(element => {
+                    self.$set(element, 'fontColor', 'black')
+                });
+            },
+        });
+
+        new Vue({
+            el: '#app',
+            data: {
+                tabVuew: 'tab-component-a'
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
