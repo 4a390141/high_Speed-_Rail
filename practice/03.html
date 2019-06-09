@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <prompt v-for="item in list" @change="update" :id:="item.id" :status="item.status"></prompt>
+    </div>
+    <script>
+
+        Vue.component('prompt', {
+            template: '<button @click="change">Update Status!</button>',
+            delimiters: ['${', '}'],
+            props: ['id', 'status'],
+            data: function () {
+                return {
+                    statusValue: this.status
+                }
+            },
+            methods: {
+                change: function () {
+                    if (this.id === 0) {
+                        this.statusValue = 'failed';
+                    } else if (this.id === 1) {
+                        this.statusValue = 'success';
+                    } else {
+                        this.statusValue = 'pending';
+                    }
+                    this.$emit('change', this.statusValue);
+                }
+            },
+            watch: {
+                statusValue: {
+                    // immediate
+                    // 監聽值在初始和值被改變時觸發function。
+                    immediate: true, 
+                    handler(newValue, oldValue) {
+                        var newStatus = newValue || 'no new value';
+                        var oldStatus = oldValue || 'no old value';
+
+                        console.log('old value: ' + oldStatus);
+                        console.log('new value: ' + newStatus);
+                    }
+                }
+            }
+        });
+
+        var vm = new Vue({
+            el: '#app',
+            delimiters: ['${', '}'],
+            data: {
+                list: [
+                    { id: 0, status: 'success' },
+                    { id: 1, status: 'pending' },
+                    { id: 2, status: 'failed' }
+                ]
+            },
+            methods: {
+                update: function (status) {
+                    console.log('update status: ' + status);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
