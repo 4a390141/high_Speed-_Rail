@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>vue-router-note</title>
+</head>
+
+<body>
+    <div>
+        <h2>view-router</h2>
+        <p>
+            使用Vue.use(VueRouter) 可增加
+            router-view 跟 router-link 兩種組件
+        </p>
+        <ul>
+            <li>
+                <h3>router-view</h3>
+                <div>
+                    基本視覺圖,name自動預設為default
+                    name屬性負責渲染相對應組件
+                </div>
+            </li>
+            <li>
+                <h3>
+                    router-link
+                </h3>
+                <div>
+                    切換路徑的連結 to......
+                </div>
+            </li>
+            <li>
+                <h3>
+                    vue-router 的模式
+                </h3>
+                <div>
+                    vue-router分成3種模式 : hash、histroy、abstract(node.js)
+                    我們可以在傳入參數寫上mode屬性預設為hash模式
+                </div>
+                <div>
+                    hash模式由#號區隔不會被URL解析透過#號來模擬路由
+                </div>
+                <div>
+                    history模式，省略#號，透過後端配合重新指向index
+                </div>
+            </li>
+            <li>
+                <h3>自訂切換路由</h3>
+                <div>
+                    router.back() / router.forword()
+                    切換上一頁下一頁
+                </div>
+                <div>
+                    router.go(n)
+                    切換頁數
+                </div>
+                <div>
+                    router.push(location)
+                    跳轉至指定頁面
+                </div>
+                <div>
+                    router.replace(location)
+                    跳轉頁面但不紀錄上一頁下一頁
+                </div>
+            </li>
+        </ul>
+    </div>
+
+</body>
+
+</html>
