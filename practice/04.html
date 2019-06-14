@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+          const self = this
+
+
+if (
+    self.OpenForm.IsRequire.length === 0 ||
+    self.OpenForm.description.length === 0 ||
+    self.OpenForm.Title.length === 0 ||
+    self.OpenForm.TitleType.length === 0
+) {
+  toastr.error('無法送出有空值')
+  return false
+}
+
+
+
+switch ($('#openedit h4').text()) {
+  case '新增欄位':
+    let sort = 1
+    if (self.TemplateOpenList.length === 1) {
+      sort = 1
+    } else {
+      sort = Math.max.apply(
+        null,
+        self.TemplateOpenList.map(function(element) {
+          return parseInt(element.Sort, 10) + 1
+        })
+      )
+    }
+    param = {
+      ticketTemplateID: self.templateID,
+      type: 'castom',
+      title: self.OpenForm.Title,
+      titleType: self.OpenForm.TitleType,
+      deleteFlag: 'N',
+      isRequire: self.OpenForm.IsRequire,
+      colType: 'Open',
+      sort: sort,
+      description: self.OpenForm.description
+    }
+    // 新增title後繼續新增item
+    self.createTicketColTitle(param).then(function(data) {
+      if (data.TicketColTitle) {
+        // 宣告item送出陣列
+        let TicketColItem = [
+          {
+            TicketColItem: [],
+            DeleteTicketColItemList: []
+          }
+        ]
+        //將目前item插入送出ㄉitem陣列中
+        self.ColItems.forEach(function(element) {
+          let param = {
+            DBID: element.ColItemID,
+            TicketColTitleID: data.TicketColTitle.DBID,
+            Item: element.Item,
+            Value: element.Value,
+            DefaultFlag: 'Y',
+            DeleteFlag: 'N',
+            Sort: element.Sort
+          }
+          TicketColItem[0].TicketColItem.push(param)
+
+          let deleteIndex = TicketColItem[0].DeleteTicketColItemList.indexOf(element.ColItemID)
+          if (deleteIndex !== -1) {
+            TicketColItem[0].DeleteTicketColItemList.splice(deleteIndex, 1)
+          }
+        })
+
+
+        self.createTicketColItem(JSON.stringify(TicketColItem)).then(function(data) {
+          $('#openedit').modal('hide')
+          self.reloadTemplateOpen()
+          toastr.success('成功新增')
+        })
+      }
+    })
+    break
+  case '編輯欄位':
+    param = {
+      ticketColTitleID: self.OpenForm.ticketColTitleID,
+      title: self.OpenForm.Title,
+      ticketTemplateID: self.templateID,
+      type: 'castom',
+      // permID: '999',
+      titleType: self.OpenForm.TitleType,
+      isRequire: self.OpenForm.IsRequire,
+      defaultValue: '',
+      colType: 'Open',
+      sort: self.OpenForm.sort,
+      // mappingExt: '',
+      isSearchKey: 'Y',
+      description: self.OpenForm.description,
+      deleteFlag: 'N'
+    }
+
+    // 更新title後繼續更新item
+    self.updateTicketColTitle(param).then(function(data) {
+      if (data.Update_TicketColTitle) {
+
+
+        // 宣告item送出陣列
+        let TicketColItem = [
+          {
+            TicketColItem: [],
+            DeleteTicketColItemList: []
+          }
+        ]
+        //防呆
+        let saveStatus = self.ColItems.every(function(element) {
+          return element.Item.length && element.Value.length
+        })
+        //先存原本有ㄉ
+        if (self.copyColItems.length !== 0){
+          TicketColItem[0].DeleteTicketColItemList = self.copyColItems.map(function(element) {
+            return element.ColItemID
+          })
+        }
+        console.log(self.ColItems)
+        //將目前item插入送出ㄉitem陣列中
+        self.ColItems.forEach(function(element) {
+          let param = {
+            DBID: element.ColItemID,
+            TicketColTitleID: data.Update_TicketColTitle.DBID,
+            Item: element.Item,
+            Value: element.Value,
+            DefaultFlag: 'Y',
+            DeleteFlag: 'N',
+            Sort: element.Sort
+          }
+          TicketColItem[0].TicketColItem.push(param)
+
+          let deleteIndex = TicketColItem[0].DeleteTicketColItemList.indexOf(element.ColItemID)
+          if (deleteIndex !== -1) {
+            TicketColItem[0].DeleteTicketColItemList.splice(deleteIndex, 1)
+          }
+        })
+
+        TicketColItem[0].DeleteTicketColItemList = TicketColItem[0].DeleteTicketColItemList.map(
+            function(element) {
+              return { DBID: element }
+            }
+        )
+
+        if (
+            self.OpenForm.TitleType === 'input' ||
+            self.OpenForm.TitleType === 'textarea' ||
+            self.OpenForm.TitleType === 'timeYMD' ||
+            self.OpenForm.TitleType === 'timeYMDHm' ||
+            self.OpenForm.TitleType === 'timeHm'
+        ){
+          saveStatus = true
+        }
+
+        let param = ''
+        if (saveStatus === false) {
+          toastr.error('選項與後台值不可為空')
+          return false
+        }
+
+
+
+
+
+
+        self.createTicketColItem(JSON.stringify(TicketColItem)).then(function(data) {
+          $('#openedit').modal('hide')
+          self.reloadTemplateOpen()
+          toastr.success('成功更新')
+        })
+      }
+    })
+
+    break
+}
+    </script>
+</body>
+</html>

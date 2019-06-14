@@ -61,10 +61,15 @@
             -ms-user-select: none;
             user-select: none;
         }
-        .fas,button{
+
+        .fas,
+        button {
             cursor: pointer;
         }
-        .fas:hover,button:hover,.far:hover{
+
+        .fas:hover,
+        button:hover,
+        .far:hover {
             transform: scale(1.15)
         }
     </style>
@@ -85,7 +90,8 @@
             <li class="" v-for="e,i in list">
                 <input type="checkbox" class="form-control" @change.stop.prevent="updateItemisComplete(e,i)"
                     :data-isComplete="e.isComplete" style="width: 8%; display: inline;" :checked="e.isComplete == 'Y'">
-                <input type="text" class="form-control" v-model="e.value" style="width: 60%; display: inline; " readonly="readonly">
+                <input type="text" class="form-control" v-model="e.value" style="width: 60%; display: inline; "
+                    readonly="readonly">
                 <i class="fas fa-chevron-up" @click="updateItemIndex('up',i)" style="width: 8%;"></i>
                 <i class="fas fa-chevron-down" @click="updateItemIndex('down',i)" style="width: 8%;"></i>
                 <span><i class="far fa-trash-alt" @click="deleteItem(i)"></i></span>
@@ -172,5 +178,7 @@
         },
     })
 </script>
+
+
 
 </html>
