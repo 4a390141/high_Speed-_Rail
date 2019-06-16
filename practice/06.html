@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+
+
+        Vue.component('info360-hd-ticket-template-open', {
+            template: `
+<div>
+        <div class="col-sm-8 m-b">
+            <button class="btn btn-outline btn-default m-r-xs" data-toggle="modal" @click="openCreateReplyModel('create')">
+                <i class="fas fa-plus"></i>
+                <span>{{ t('common.create') }}</span>
+            </button>
+            <button class="btn btn-outline btn-default m-r-xs" data-toggle="modal" data-target="#columndelete" @click="deleteTicketColTitle">
+                <i class="far fa-trash-alt"></i>
+                <span>{{ t('common.delete') }}</span>
+            </button>
+            <button class="btn btn-outline btn-default m-r-xs" data-toggle="modal" @click="updateSort">
+                <i class="fas fa-check"></i>
+                <span>{{ t('TicketTemplateSetting.SaveSort') }}</span>
+            </button>
+        </div>
+        <!--搜尋-->
+        <datatable-searchbox class="col-sm-4" :searchtext.sync="CustomerDataMainTableSearchText"></datatable-searchbox>
+        <data-table-client-side class="col-sm-12 scroller btn-search CustomerDataMainTable"
+            :columns="CusDataMappingHeaders" :fixed-header="false" :source="TemplateOpenList" @save-data="saveSource"
+            @tr-click="openCreateReplyModel" :checkbox-column="0" :checked-data.sync="checkedData"
+            :search-text="CustomerDataMainTableSearchText">
+        </data-table-client-side>
+        
+        <!--Modal-新增/編輯欄位(點tr編輯共用)-->
+    <div id="openedit" class="modal inmodal fade in" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title">{{ t('TicketTemplateSetting.addField') }}</h4>
+                </div>
+                <div class="modal-body scroller">
+                    <div class="row">
+                        <form>
+                            <div class="form-group col-sm-12">
+                                <label class="col-sm-2 control-label labelcenter">{{ t('TicketTemplateSetting.FieldName') }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" placeholder="請輸入欄位名稱" v-model="OpenForm.Title">
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12">
+                                <label class="col-sm-2 control-label labelcenter">{{ t('TicketTemplateSetting.Remark') }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" placeholder="請輸入備註" v-model="OpenForm.description">
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12">
+                                <label class="col-sm-2 control-label labelcenter">{{ t('TicketTemplateSetting.FieldType') }}</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" v-model="OpenForm.TitleType" @change="changeTitleType">
+                                        <option value="">{{ t('TicketTemplateSetting.selectFieldType') }}</option>
+                                        <option value="input">{{ t('TicketTemplateSetting.input') }}</option>
+                                        <option value="textarea">{{ t('TicketTemplateSetting.textarea') }}</option>
+                                        <option value="timeYMD">{{ t('TicketTemplateSetting.timeYMD') }}</option>
+                                        <option value="timeYMDHm">{{ t('TicketTemplateSetting.timeYMDHm') }}</option>
+                                        <option value="timeHm">{{ t('TicketTemplateSetting.timeHm') }}</option>
+                                        <option value="checkbox">{{ t('TicketTemplateSetting.checkbox') }}</option>
+                                        <option value="radio">{{ t('TicketTemplateSetting.radio') }}</option>
+                                        <option value="select">下{{ t('TicketTemplateSetting.select') }}</option>
+                                        <option value="selectlist">{{ t('TicketTemplateSetting.selectlist') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12">
+                                <label class="col-sm-2 control-label labelcenter">{{ t('TicketTemplateSetting.requiredOrNot') }}</label>
+                                <div class="col-sm-10">
+                                    <div class="radio">
+                                        <input type="radio" id="Radio1" value="Y" name="radioInline" checked="" v-model="OpenForm.IsRequire">
+                                        <label for="Radio1">{{ t('common.Yes') }}</label>
+                                    </div>
+                                    <div class="radio">
+                                        <input type="radio" id="Radio2" value="N" name="radioInline" v-model="OpenForm.IsRequire">
+                                        <label for="Radio2">{{ t('common.No') }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12" v-if="(OpenForm.TitleType==='checkbox')||(OpenForm.TitleType==='radio')||(OpenForm.TitleType==='select')||(OpenForm.TitleType==='selectlist')">
+                                <label class="col-sm-2 control-label labelcenter">{{ t('common.content') }}</label>
+                                <div class="col-sm-10">
+                                    <button type="button" class="btn btn-outline btn-primary btn-sm m-b" @click="createNewItemform">
+                                        <span>{{ t('TicketTemplateSetting.NewOption') }}</span>
+                                    </button>
+                                    <div role="grid" class="dataTables_wrapper form-inline">
+                                        <table aria-describedby="editable_info"
+                                               class="table table-striped table-bordered table-hover dataTable">
+                                            <thead>
+                                            <tr role="row">
+                                                <th>{{ t('TicketTemplateSetting.Option') }}</th>
+                                                <th>{{ t('TicketTemplateSetting.BackgroundValue') }}</th>
+                                                <th>{{ t('TicketTemplateSetting.Sort') }}</th>
+                                                <th>{{ t('common.delete') }}</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr v-for="e,i in ColItems">
+                                                <td><input v-model="e.Item" type="text" class="form-control" style="width: 100%;"></td>
+                                                <td><input v-model="e.Value" type="text" class="form-control" style="width: 100%;"></td>
+                                                <td>
+                                                    <i class="fas fa-chevron-up" @click.stop.prevent="updateItemSort('up',e,i)"></i>
+                                                    <i class="fas fa-chevron-down" @click.stop.prevent="updateItemSort('down',e,i)"></i>
+                                                </td>
+                                                <td>
+                                                    <span @click.stop.prevent="removeThisItem(i)">
+                                                        <i class="far fa-trash-alt" ></i>
+                                                    </span>                                      
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline btn-primary" @click="saveOpen">
+                        <i class="fas fa-check"></i>
+                        <span>{{ t('common.save') }}</span>
+                    </button>
+                    <button class="btn btn-outline btn-default" data-dismiss="modal" @click="closeModel">
+                        <i class="fas fa-times"></i>
+                        <span>{{ t('common.cancel') }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  `,
+            props: {
+                templateID: { required: true },
+                tenantID: { required: true },
+                typeID: { required: true }
+            },
+            data() {
+                return {
+                    templateID: '',
+                    tenantID: '',
+                    typeID: '',
+                    CusDataMappingHeaders: [
+                        {
+                            mData: function (data, type, val) {
+                                return JSON.stringify(data)
+                            },
+                            width: '5%',
+                            checkboxes: {
+                                selectRow: true
+                            }
+                        },
+                        {
+                            data: 'Title',
+                            width: '25%',
+                            sTitle: t('TicketTemplateSetting.StateName'),
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return data ? data : t('common.nothing')
+                            }
+                        },
+                        {
+                            data: 'description',
+                            width: '25%',
+                            sTitle: t('TicketTemplateSetting.Remark'),
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return data ? data : t('common.nothing')
+                            }
+                        },
+                        {
+                            data: 'TitleType',
+                            width: '25%',
+                            sTitle: t('TicketTemplateSetting.StatusType'),
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return data ? data : t('common.nothing')
+                            }
+                        },
+                        {
+                            data: 'IsRequire',
+                            width: '25%',
+                            sTitle: t('TicketTemplateSetting.requiredOrNot'),
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return data ? data : t('common.nothing')
+                            }
+                        },
+                        {
+                            data: 'SensitiveWord',
+                            width: '25%',
+                            sTitle: t('TicketTemplateSetting.Sort'),
+                            orderable: false,
+                            render: function (data, type, full, row) {
+                                return `
+                      <i class="fas fa-chevron-up open-up-sort" value="${
+                                    full.TicketColTitleID
+                                    }" style="font-size: 15px;"></i>
+                      <i class="fas fa-chevron-down open-down-sort" value="${
+                                    full.TicketColTitleID
+                                    }" style="font-size: 15px;"></i>
+                  `
+                            }
+                        }
+                    ],
+                    TemplateOpenList: [],
+                    CustomerDataMainTableSearchText: '',
+                    checkedData: [],
+                    ColItems: [],
+                    copyColItems: [],
+                    OpenForm: {
+                        Title: '',
+                        TitleType: '',
+                        IsRequire: '',
+                        ticketColTitleID: '',
+                        sort: ''
+                    },
+                    TicketColTitleID: ''
+                }
+            },
+            mounted() {
+                const self = this
+                //取得id去撈資料
+                //  撈出reason
+                self.reloadTemplateOpen()
+            },
+            beforeUpdate() {
+                const self = this
+                $('.open-up-sort').on('click', function (event) {
+                    let id = event.target.attributes.value.nodeValue
+                    let index = self.TemplateOpenList.findIndex(function (element, index, array) {
+                        return element.TicketColTitleID.toString() === id
+                    })
+                    if (index !== 0) {
+                        ;[self.TemplateOpenList[index].Sort, self.TemplateOpenList[index - 1].Sort] = [
+                            self.TemplateOpenList[index - 1].Sort,
+                            self.TemplateOpenList[index].Sort
+                        ]
+                    }
+                    self.TemplateOpenList = self.OpenTemplateSort(self.TemplateOpenList)
+                    event.stopPropagation()
+                    event.preventDefault()
+                })
+                $('.open-down-sort').on('click', function (event) {
+                    let id = event.target.attributes.value.nodeValue
+                    let index = self.TemplateOpenList.findIndex(function (element, index, array) {
+                        return element.TicketColTitleID.toString() === id
+                    })
+                    if (index !== self.TemplateOpenList.length - 1) {
+                        ;[self.TemplateOpenList[index].Sort, self.TemplateOpenList[index + 1].Sort] = [
+                            self.TemplateOpenList[index + 1].Sort,
+                            self.TemplateOpenList[index].Sort
+                        ]
+                    }
+                    self.TemplateOpenList = self.OpenTemplateSort(self.TemplateOpenList)
+                    event.stopPropagation()
+                    event.preventDefault()
+                })
+            },
+            methods: {
+                //排序
+                OpenTemplateSort(data) {
+                    return data.sort(function (a, b) {
+                        return parseInt(a.Sort, 10) - parseInt(b.Sort, 10)
+                    })
+                },
+                //排除刪除的
+                OpenTemplateDeleteFlag(data) {
+                    return data.filter(function (e) {
+                        return e.DeleteFlag !== 'Y'
+                    })
+                },
+                reloadTemplateOpen() {
+                    const self = this
+                    self.getTemplateOpen(self.templateID).then(function (data) {
+                        'ColList' in data.TicketTemplate[0]
+                            ? (self.TemplateOpenList = data.TicketTemplate[0].ColList)
+                            : (self.TemplateOpenList = [])
+                        if (self.TemplateOpenList) {
+                            self.TemplateOpenList = self.OpenTemplateDeleteFlag(self.TemplateOpenList)
+                            self.TemplateOpenList = self.OpenTemplateSort(self.TemplateOpenList)
+                        }
+                    })
+                },
+                //取得當前Open 資料
+                getTemplateOpen(templateID) {
+                    const self = this
+                    const param = {
+                        tenantID: self.tenantID,
+                        entityTypeID: 11,
+                        typeID: self.typeID,
+                        ticketTemplateID: templateID,
+                        colType: 2,
+                        DeleteFlag: 'N'
+                    }
+                    return APIManager.get('TicketTemplateInfo').by(param)
+                },
+                createNewItemform() {
+                    const self = this
+
+                    let maxSort = Math.max.apply(
+                        null,
+                        self.ColItems.map(function (element) {
+                            return element.Sort
+                        })
+                    )
+                    if (self.ColItems.length === 0) {
+                        maxSort = 0
+                    }
+                    let pram = {
+                        // ColItemID: undefined,
+                        DefaultFlag: 'Y',
+                        Item: '',
+                        TicketColTitleID: '',
+                        value: '',
+                        Sort: maxSort + 1
+                    }
+                    self.ColItems.push(pram)
+                },
+                createReply() {
+                    const self = this
+                },
+                openCreateReplyModel(e) {
+                    const self = this
+                    $('#openedit').modal('show')
+                    switch (e) {
+                        case 'create':
+                            $('#openedit h4').text(t('TicketTemplateSetting.addField'))
+                            self.OpenForm.Title = ''
+                            self.OpenForm.TitleType = ''
+                            self.OpenForm.IsRequire = 'Y'
+                            self.OpenForm.description = ''
+                            self.OpenForm.ticketColTitleID = ''
+                            self.copyColItems = []
+                            self.changeTitleType()
+                            break
+                        default:
+                            $('#openedit h4').text(t('TicketTemplateSetting.editField'))
+                            if (e.ColItems) {
+                                self.ColItems = self.OpenTemplateSort(e.ColItems)
+                                self.copyColItems = self.ColItems.map(function (element) {
+                                    return element
+                                })
+                            }
+                            self.OpenForm.Title = e.Title
+                            self.OpenForm.TitleType = e.TitleType
+                            self.OpenForm.IsRequire = e.IsRequire
+                            self.OpenForm.description = e.description
+                            self.OpenForm.ticketColTitleID = e.TicketColTitleID
+                            self.OpenForm.sort = e.Sort
+                            break
+                    }
+                },
+                closeModel() {
+                    const self = this
+                    $('#openedit').modal('hide')
+                    self.reloadTemplateOpen()
+                },
+                saveOpen() {
+                    const self = this
+
+                    //防呆
+                    if (
+                        self.OpenForm.IsRequire.length === 0 ||
+                        self.OpenForm.description.length === 0 ||
+                        self.OpenForm.Title.length === 0 ||
+                        self.OpenForm.TitleType.length === 0
+                    ) {
+                        toastr.error(t('TicketTemplateSetting.CannotBeNull'))
+                        return false
+                    }
+                    //防呆
+                    let saveStatus = self.ColItems.every(function (element) {
+                        return element.Item.length !== 0 && element.Value.length !== 0
+                    })
+                    if (
+                        self.OpenForm.TitleType === 'input' ||
+                        self.OpenForm.TitleType === 'textarea' ||
+                        self.OpenForm.TitleType === 'timeYMD' ||
+                        self.OpenForm.TitleType === 'timeYMDHm' ||
+                        self.OpenForm.TitleType === 'timeHm'
+                    ) {
+                        saveStatus = true
+                    }
+
+                    let param = ''
+                    if (saveStatus === false) {
+                        toastr.error(t('TicketTemplateSetting.CannotBeNull'))
+                        return false
+                    }
+
+                    switch ($('#openedit h4').text()) {
+                        case t('TicketTemplateSetting.addField'):
+                            let sort = 1
+                            //  取得sort
+                            if (self.TemplateOpenList.length === 0) {
+                                sort = 1
+                            } else {
+                                sort = Math.max.apply(
+                                    null,
+                                    self.TemplateOpenList.map(function (element) {
+                                        return parseInt(element.Sort, 10) + 1
+                                    })
+                                )
+                            }
+                            param = {
+                                ticketTemplateID: self.templateID,
+                                type: 'castom',
+                                title: self.OpenForm.Title,
+                                titleType: self.OpenForm.TitleType,
+                                deleteFlag: 'N',
+                                isRequire: self.OpenForm.IsRequire,
+                                colType: 'Open',
+                                sort: sort,
+                                description: self.OpenForm.description
+                            }
+                            // 新增title後繼續新增item
+                            self.createTicketColTitle(param).then(function (data) {
+                                if (data.TicketColTitle) {
+                                    // 宣告item送出陣列
+                                    let TicketColItem = [
+                                        {
+                                            TicketColItem: [],
+                                            DeleteTicketColItemList: []
+                                        }
+                                    ]
+                                    //將目前item插入送出ㄉitem陣列中
+                                    self.ColItems.forEach(function (element) {
+                                        let param = {
+                                            TicketColTitleID: data.TicketColTitle.DBID,
+                                            Item: element.Item,
+                                            Value: element.Value,
+                                            DefaultFlag: 'Y',
+                                            DeleteFlag: 'N',
+                                            Sort: element.Sort
+                                        }
+                                        TicketColItem[0].TicketColItem.push(param)
+                                    })
+
+                                    self.createTicketColItem(JSON.stringify(TicketColItem)).then(function (data) {
+                                        $('#openedit').modal('hide')
+                                        self.reloadTemplateOpen()
+                                        toastr.success('成功新增')
+                                    })
+                                }
+                            })
+                            break
+                        case t('TicketTemplateSetting.editField'):
+                            param = {
+                                ticketColTitleID: self.OpenForm.ticketColTitleID,
+                                title: self.OpenForm.Title,
+                                ticketTemplateID: self.templateID,
+                                type: 'castom',
+                                // permID: '999',
+                                titleType: self.OpenForm.TitleType,
+                                isRequire: self.OpenForm.IsRequire,
+                                defaultValue: '',
+                                colType: 'Open',
+                                sort: self.OpenForm.sort,
+                                // mappingExt: '',
+                                isSearchKey: 'Y',
+                                description: self.OpenForm.description,
+                                deleteFlag: 'N'
+                            }
+
+                            // 更新title後繼續更新item
+                            self.updateTicketColTitle(param).then(function (data) {
+                                if (data.Update_TicketColTitle) {
+                                    // 宣告item送出陣列
+                                    let TicketColItem = [
+                                        {
+                                            TicketColItem: [],
+                                            DeleteTicketColItemList: []
+                                        }
+                                    ]
+                                    //先存原本有ㄉ
+                                    if (self.copyColItems.length !== 0) {
+                                        TicketColItem[0].DeleteTicketColItemList = self.copyColItems.map(function (element) {
+                                            return element.ColItemID
+                                        })
+                                    }
+                                    //將目前item插入送出ㄉitem陣列中
+                                    self.ColItems.forEach(function (element) {
+                                        let param = {
+                                            TicketColTitleID: data.Update_TicketColTitle.DBID,
+                                            Item: element.Item,
+                                            Value: element.Value,
+                                            DefaultFlag: 'Y',
+                                            DeleteFlag: 'N',
+                                            Sort: element.Sort
+                                        }
+                                        if ('ColItemID' in element) {
+                                            param.DBID = element.ColItemID
+                                        }
+                                        TicketColItem[0].TicketColItem.push(param)
+
+                                        let deleteIndex = TicketColItem[0].DeleteTicketColItemList.indexOf(
+                                            element.ColItemID
+                                        )
+                                        if (deleteIndex !== -1) {
+                                            TicketColItem[0].DeleteTicketColItemList.splice(deleteIndex, 1)
+                                        }
+                                    })
+
+                                    TicketColItem[0].DeleteTicketColItemList = TicketColItem[0].DeleteTicketColItemList.map(
+                                        function (element) {
+                                            return { DBID: element }
+                                        }
+                                    )
+
+                                    self.createTicketColItem(JSON.stringify(TicketColItem)).then(function (data) {
+                                        $('#openedit').modal('hide')
+                                        self.reloadTemplateOpen()
+                                        toastr.success(t('common.successUpdate'))
+                                    })
+                                }
+                            })
+                            break
+                    }
+                },
+                updateTicketColTitle(param) {
+                    let self = this
+                    return APIManager.update('TicketColTitle').by(param)
+                },
+                createTicketColTitle(param) {
+                    let self = this
+                    return APIManager.insert('TicketColTitle').by(param)
+                },
+                createTicketColItem(TicketColItemData) {
+                    let param = {
+                        ticketColItemList: TicketColItemData
+                    }
+                    return APIManager.update('TicketColItem').by(param)
+                },
+                updateTicketColTitle(param) {
+                    let self = this
+                    return APIManager.update('TicketColTitle').by(param)
+                },
+                updateReply() {
+                    const self = this
+                },
+                saveSource() { },
+                //  刪除
+                deleteTicketColTitle() {
+                    const self = this
+                    // self.checkedData.forEach(function(e) {
+                    //   let param = {
+                    //     ticketColTitleID: e.TicketColTitleID,
+                    //     title: e.Title,
+                    //     deleteFlag: 'Y',
+                    //     ticketTemplateID: self.templateID,
+                    //     type: 'castom'
+                    //   }
+                    //   APIManager.update('TicketColTitle')
+                    //     .by(param)
+                    //     .then(function(data) {
+                    //       self.reloadTemplateOpen()
+                    //       toastr.success('刪除成功')
+                    //     })
+                    // })
+                    let deleteString = ''
+                    self.checkedData.forEach(function (e) {
+                        deleteString += e.TicketColTitleID + ','
+                    })
+                    APIManager.delete('TicketColTitle')
+                        .by({
+                            ticketColTitleIDs: deleteString.substring(0, deleteString.length - 1)
+                        })
+                        .then(function (value) {
+                            toastr.success(t('common.successdeleted'))
+                            self.reloadTemplateOpen()
+                        })
+                },
+                //  換欄位類型
+                changeTitleType() {
+                    //有更換都變回1個item
+                    const self = this
+                    //清空item
+                    self.ColItems.length = 0
+
+                    self.createNewItemform()
+                },
+                removeThisItem(i) {
+                    const self = this
+                    if (self.ColItems.length > 1) {
+                        self.ColItems.splice(i, 1)
+                    } else {
+                        toastr.error(t('TicketTemplateSetting.CannotBeDeleted'))
+                    }
+                },
+                //  儲存排序
+                updateSort() {
+                    const self = this
+                    //防呆
+                    if (self.TemplateOpenList.length === 0) {
+                        return false
+                    }
+                    let array = []
+                    self.TemplateOpenList.forEach(function (element, index) {
+                        let param = {
+                            id: element.TicketColTitleID,
+                            sort: element.Sort
+                        }
+                        array.push(param)
+                    })
+
+                    APIManager.update('updateTicketColTitleSort')
+                        .by({
+                            ColTitleSortJson: JSON.stringify(array)
+                        })
+                        .then(function (data) {
+                            self.reloadTemplateOpen()
+                            toastr.success(t('common.successUpdate'))
+                        })
+                },
+                updateItemSort(status, element, index) {
+                    const self = this
+                    switch (status) {
+                        case 'up':
+                            if (index !== 0) {
+                                ;[self.ColItems[index].Sort, self.ColItems[index - 1].Sort] = [
+                                    self.ColItems[index - 1].Sort,
+                                    self.ColItems[index].Sort
+                                ][(self.ColItems[index].Sort, self.ColItems[index - 1].Sort)] = [
+                                        self.ColItems[index - 1].Sort,
+                                        self.ColItems[index].Sort
+                                    ]
+                            }
+                            break
+                        case 'down':
+                            if (index !== self.ColItems.length - 1) {
+                                ;[self.ColItems[index].Sort, self.ColItems[index + 1].Sort] = [
+                                    self.ColItems[index + 1].Sort,
+                                    self.ColItems[index].Sort
+                                ][(self.ColItems[index].Sort, self.ColItems[index + 1].Sort)] = [
+                                        self.ColItems[index + 1].Sort,
+                                        self.ColItems[index].Sort
+                                    ]
+                            }
+                            break
+                    }
+                    //排序
+                    self.ColItems = self.OpenTemplateSort(self.ColItems)
+                }
+            }
+        })
+
+
+
+    </script>
+</body>
+
+</html>

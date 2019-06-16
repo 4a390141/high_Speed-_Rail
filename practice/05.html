@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        var node = {}
+        node.url = 'http://localhost:8080/info360/info360CustomizedView?page=TMAgent-webForm&reqparams=iassuredID&iassuredID=searchKey'
+        if (node.url && node.url.indexOf('info360CustomizedView') !== -1) {
+            let pervUrl = node.url.substring(0, node.url.lastIndexOf('/') + 1);
+            let page = getParameterByName('page', node.url);
+            if (pervUrl && page) {
+                let targetUrl = pervUrl + page;
+                console.log(targetUrl)
+            }
+        }
+        console
+    </script>
+</body>
+
+</html>

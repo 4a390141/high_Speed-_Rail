@@ -1,163 +1,314 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
 </head>
+
 <body>
-    <script>
-          const self = this
+  <script>
+    const self = this
 
 
-if (
-    self.OpenForm.IsRequire.length === 0 ||
-    self.OpenForm.description.length === 0 ||
-    self.OpenForm.Title.length === 0 ||
-    self.OpenForm.TitleType.length === 0
-) {
-  toastr.error('無法送出有空值')
-  return false
-}
-
-
-
-switch ($('#openedit h4').text()) {
-  case '新增欄位':
-    let sort = 1
-    if (self.TemplateOpenList.length === 1) {
-      sort = 1
-    } else {
-      sort = Math.max.apply(
-        null,
-        self.TemplateOpenList.map(function(element) {
-          return parseInt(element.Sort, 10) + 1
-        })
-      )
-    }
-    param = {
-      ticketTemplateID: self.templateID,
-      type: 'castom',
-      title: self.OpenForm.Title,
-      titleType: self.OpenForm.TitleType,
-      deleteFlag: 'N',
-      isRequire: self.OpenForm.IsRequire,
-      colType: 'Open',
-      sort: sort,
-      description: self.OpenForm.description
-    }
-    // 新增title後繼續新增item
-    self.createTicketColTitle(param).then(function(data) {
-      if (data.TicketColTitle) {
-        // 宣告item送出陣列
-        let TicketColItem = [
-          {
-            TicketColItem: [],
-            DeleteTicketColItemList: []
-          }
-        ]
-        //將目前item插入送出ㄉitem陣列中
-        self.ColItems.forEach(function(element) {
-          let param = {
-            DBID: element.ColItemID,
-            TicketColTitleID: data.TicketColTitle.DBID,
-            Item: element.Item,
-            Value: element.Value,
-            DefaultFlag: 'Y',
-            DeleteFlag: 'N',
-            Sort: element.Sort
-          }
-          TicketColItem[0].TicketColItem.push(param)
-
-          let deleteIndex = TicketColItem[0].DeleteTicketColItemList.indexOf(element.ColItemID)
-          if (deleteIndex !== -1) {
-            TicketColItem[0].DeleteTicketColItemList.splice(deleteIndex, 1)
-          }
-        })
-
-
-        self.createTicketColItem(JSON.stringify(TicketColItem)).then(function(data) {
-          $('#openedit').modal('hide')
-          self.reloadTemplateOpen()
-          toastr.success('成功新增')
-        })
-      }
-    })
-    break
-  case '編輯欄位':
-    param = {
-      ticketColTitleID: self.OpenForm.ticketColTitleID,
-      title: self.OpenForm.Title,
-      ticketTemplateID: self.templateID,
-      type: 'castom',
-      // permID: '999',
-      titleType: self.OpenForm.TitleType,
-      isRequire: self.OpenForm.IsRequire,
-      defaultValue: '',
-      colType: 'Open',
-      sort: self.OpenForm.sort,
-      // mappingExt: '',
-      isSearchKey: 'Y',
-      description: self.OpenForm.description,
-      deleteFlag: 'N'
+    if (
+      self.OpenForm.IsRequire.length === 0 ||
+      self.OpenForm.description.length === 0 ||
+      self.OpenForm.Title.length === 0 ||
+      self.OpenForm.TitleType.length === 0
+    ) {
+      toastr.error('無法送出有空值')
+      return false
     }
 
-    // 更新title後繼續更新item
-    self.updateTicketColTitle(param).then(function(data) {
-      if (data.Update_TicketColTitle) {
 
 
-        // 宣告item送出陣列
-        let TicketColItem = [
-          {
-            TicketColItem: [],
-            DeleteTicketColItemList: []
-          }
-        ]
-        //防呆
-        let saveStatus = self.ColItems.every(function(element) {
-          return element.Item.length && element.Value.length
-        })
-        //先存原本有ㄉ
-        if (self.copyColItems.length !== 0){
-          TicketColItem[0].DeleteTicketColItemList = self.copyColItems.map(function(element) {
-            return element.ColItemID
-          })
+    switch ($('#openedit h4').text()) {
+      case '新增欄位':
+        let sort = 1
+        if (self.TemplateOpenList.length === 1) {
+          sort = 1
+        } else {
+          sort = Math.max.apply(
+            null,
+            self.TemplateOpenList.map(function (element) {
+              return parseInt(element.Sort, 10) + 1
+            })
+          )
         }
-        console.log(self.ColItems)
-        //將目前item插入送出ㄉitem陣列中
-        self.ColItems.forEach(function(element) {
-          let param = {
-            DBID: element.ColItemID,
-            TicketColTitleID: data.Update_TicketColTitle.DBID,
-            Item: element.Item,
-            Value: element.Value,
-            DefaultFlag: 'Y',
-            DeleteFlag: 'N',
-            Sort: element.Sort
-          }
-          TicketColItem[0].TicketColItem.push(param)
+        param = {
+          ticketTemplateID: self.templateID,
+          type: 'castom',
+          title: self.OpenForm.Title,
+          titleType: self.OpenForm.TitleType,
+          deleteFlag: 'N',
+          isRequire: self.OpenForm.IsRequire,
+          colType: 'Open',
+          sort: sort,
+          description: self.OpenForm.description
+        }
+        // 新增title後繼續新增item
+        self.createTicketColTitle(param).then(function (data) {
+          if (data.TicketColTitle) {
+            // 宣告item送出陣列
+            let TicketColItem = [
+              {
+                TicketColItem: [],
+                DeleteTicketColItemList: []
+              }
+            ]
+            //將目前item插入送出ㄉitem陣列中
+            self.ColItems.forEach(function (element) {
+              let param = {
+                DBID: element.ColItemID,
+                TicketColTitleID: data.TicketColTitle.DBID,
+                Item: element.Item,
+                Value: element.Value,
+                DefaultFlag: 'Y',
+                DeleteFlag: 'N',
+                Sort: element.Sort
+              }
+              TicketColItem[0].TicketColItem.push(param)
 
-          let deleteIndex = TicketColItem[0].DeleteTicketColItemList.indexOf(element.ColItemID)
-          if (deleteIndex !== -1) {
-            TicketColItem[0].DeleteTicketColItemList.splice(deleteIndex, 1)
+              let deleteIndex = TicketColItem[0].DeleteTicketColItemList.indexOf(element.ColItemID)
+              if (deleteIndex !== -1) {
+                TicketColItem[0].DeleteTicketColItemList.splice(deleteIndex, 1)
+              }
+            })
+
+
+            self.createTicketColItem(JSON.stringify(TicketColItem)).then(function (data) {
+              $('#openedit').modal('hide')
+              self.reloadTemplateOpen()
+              toastr.success('成功新增')
+            })
+          }
+        })
+        break
+      case '編輯欄位':
+        param = {
+          ticketColTitleID: self.OpenForm.ticketColTitleID,
+          title: self.OpenForm.Title,
+          ticketTemplateID: self.templateID,
+          type: 'castom',
+          // permID: '999',
+          titleType: self.OpenForm.TitleType,
+          isRequire: self.OpenForm.IsRequire,
+          defaultValue: '',
+          colType: 'Open',
+          sort: self.OpenForm.sort,
+          // mappingExt: '',
+          isSearchKey: 'Y',
+          description: self.OpenForm.description,
+          deleteFlag: 'N'
+        }
+
+        // 更新title後繼續更新item
+        self.updateTicketColTitle(param).then(function (data) {
+          if (data.Update_TicketColTitle) {
+
+
+            // 宣告item送出陣列
+            let TicketColItem = [
+              {
+                TicketColItem: [],
+                DeleteTicketColItemList: []
+              }
+            ]
+            //防呆
+            let saveStatus = self.ColItems.every(function (element) {
+              return element.Item.length && element.Value.length
+            })
+            //先存原本有ㄉ
+            if (self.copyColItems.length !== 0) {
+              TicketColItem[0].DeleteTicketColItemList = self.copyColItems.map(function (element) {
+                return element.ColItemID
+              })
+            }
+            console.log(self.ColItems)
+            //將目前item插入送出ㄉitem陣列中
+            self.ColItems.forEach(function (element) {
+              let param = {
+                DBID: element.ColItemID,
+                TicketColTitleID: data.Update_TicketColTitle.DBID,
+                Item: element.Item,
+                Value: element.Value,
+                DefaultFlag: 'Y',
+                DeleteFlag: 'N',
+                Sort: element.Sort
+              }
+              TicketColItem[0].TicketColItem.push(param)
+
+              let deleteIndex = TicketColItem[0].DeleteTicketColItemList.indexOf(element.ColItemID)
+              if (deleteIndex !== -1) {
+                TicketColItem[0].DeleteTicketColItemList.splice(deleteIndex, 1)
+              }
+            })
+
+            TicketColItem[0].DeleteTicketColItemList = TicketColItem[0].DeleteTicketColItemList.map(
+              function (element) {
+                return { DBID: element }
+              }
+            )
+
+            if (
+              self.OpenForm.TitleType === 'input' ||
+              self.OpenForm.TitleType === 'textarea' ||
+              self.OpenForm.TitleType === 'timeYMD' ||
+              self.OpenForm.TitleType === 'timeYMDHm' ||
+              self.OpenForm.TitleType === 'timeHm'
+            ) {
+              saveStatus = true
+            }
+
+            let param = ''
+            if (saveStatus === false) {
+              toastr.error('選項與後台值不可為空')
+              return false
+            }
+
+
+
+
+
+
+            self.createTicketColItem(JSON.stringify(TicketColItem)).then(function (data) {
+              $('#openedit').modal('hide')
+              self.reloadTemplateOpen()
+              toastr.success('成功更新')
+            })
           }
         })
 
-        TicketColItem[0].DeleteTicketColItemList = TicketColItem[0].DeleteTicketColItemList.map(
-            function(element) {
-              return { DBID: element }
-            }
-        )
+        break
+    }
+  </script>
 
+
+  <script>
+    methods: {
+      //排序
+      OpenTemplateSort(data) {
+        return data.sort(function (a, b) {
+          return parseInt(a.Sort, 10) - parseInt(b.Sort, 10)
+        })
+      },
+      //排除刪除的
+      OpenTemplateDeleteFlag(data) {
+        return data.filter(function (e) {
+          return e.DeleteFlag !== 'Y'
+        })
+      },
+      reloadTemplateOpen() {
+        const self = this
+        self.getTemplateOpen(self.templateID).then(function (data) {
+          'ColList' in data.TicketTemplate[0]
+            ? (self.TemplateOpenList = data.TicketTemplate[0].ColList)
+            : (self.TemplateOpenList = [])
+          if (self.TemplateOpenList) {
+            self.TemplateOpenList = self.OpenTemplateDeleteFlag(self.TemplateOpenList)
+            self.TemplateOpenList = self.OpenTemplateSort(self.TemplateOpenList)
+          }
+        })
+      },
+      //取得當前Open 資料
+      getTemplateOpen(templateID) {
+        const self = this
+        const param = {
+          tenantID: self.tenantID,
+          entityTypeID: 11,
+          typeID: self.typeID,
+          ticketTemplateID: templateID,
+          colType: 2,
+          DeleteFlag: 'N'
+        }
+        return APIManager.get('TicketTemplateInfo').by(param)
+      },
+      createNewItemform(TitleID) {
+        const self = this
+
+        let maxSort = Math.max.apply(
+          null,
+          self.ColItems.map(function (element) {
+            return element.Sort
+          })
+        )
+        if (self.ColItems.length === 0) {
+          maxSort = 0
+        }
+        let pram = {
+          // ColItemID: undefined,
+          DefaultFlag: 'Y',
+          Item: '',
+          TicketColTitleID: TitleID,
+          value: '',
+          Sort: maxSort + 1
+        }
+        self.ColItems.push(pram)
+      },
+      createReply() {
+        const self = this
+      },
+      openCreateReplyModel(e) {
+        const self = this
+        $('#openedit').modal('show')
+        switch (e) {
+          case 'create':
+            $('#openedit h4').text('新增欄位')
+            self.OpenForm.Title = ''
+            self.OpenForm.TitleType = ''
+            self.OpenForm.IsRequire = 'Y'
+            self.OpenForm.description = ''
+            self.OpenForm.ticketColTitleID = ''
+            self.copyColItems = []
+            self.changeTitleType()
+            break
+          default:
+            $('#openedit h4').text('編輯欄位')
+            if (e.ColItems) {
+              self.ColItems = self.OpenTemplateSort(e.ColItems)
+              self.copyColItems = self.ColItems.map(function (element) {
+                return element
+              })
+            }
+            self.OpenForm.Title = e.Title
+            self.OpenForm.TitleType = e.TitleType
+            self.OpenForm.IsRequire = e.IsRequire
+            self.OpenForm.description = e.description
+            self.OpenForm.ticketColTitleID = e.TicketColTitleID
+            self.OpenForm.sort = e.Sort
+            break
+        }
+      },
+      closeModel() {
+        $('#openedit').modal('hide')
+      },
+      saveOpen() {
+        const self = this
+
+        //防呆
         if (
-            self.OpenForm.TitleType === 'input' ||
-            self.OpenForm.TitleType === 'textarea' ||
-            self.OpenForm.TitleType === 'timeYMD' ||
-            self.OpenForm.TitleType === 'timeYMDHm' ||
-            self.OpenForm.TitleType === 'timeHm'
-        ){
+          self.OpenForm.IsRequire.length === 0 ||
+          self.OpenForm.description.length === 0 ||
+          self.OpenForm.Title.length === 0 ||
+          self.OpenForm.TitleType.length === 0
+        ) {
+          toastr.error('無法送出有空值')
+          return false
+        }
+        //防呆
+        let saveStatus = self.ColItems.every(function (element) {
+          return element.Item.length !== 0 && element.Value.length !== 0
+        })
+        if (
+          self.OpenForm.TitleType === 'input' ||
+          self.OpenForm.TitleType === 'textarea' ||
+          self.OpenForm.TitleType === 'timeYMD' ||
+          self.OpenForm.TitleType === 'timeYMDHm' ||
+          self.OpenForm.TitleType === 'timeHm'
+        ) {
           saveStatus = true
         }
 
@@ -167,21 +318,317 @@ switch ($('#openedit h4').text()) {
           return false
         }
 
+        switch ($('#openedit h4').text()) {
+          case '新增欄位':
+            let sort = 1
+            //  取得sort
+            if (self.TemplateOpenList.length === 0) {
+              sort = 1
+            } else {
+              sort = Math.max.apply(
+                null,
+                self.TemplateOpenList.map(function (element) {
+                  return parseInt(element.Sort, 10) + 1
+                })
+              )
+            }
+            param = {
+              ticketTemplateID: self.templateID,
+              type: 'castom',
+              title: self.OpenForm.Title,
+              titleType: self.OpenForm.TitleType,
+              deleteFlag: 'N',
+              isRequire: self.OpenForm.IsRequire,
+              colType: 'Open',
+              sort: sort,
+              description: self.OpenForm.description
+            }
+            // 新增title後繼續新增item
+            self.createTicketColTitle(param).then(function (data) {
+              if (data.TicketColTitle) {
+                // 宣告item送出陣列
+                let TicketColItem = [
+                  {
+                    TicketColItem: [],
+                    DeleteTicketColItemList: []
+                  }
+                ]
+                //將目前item插入送出ㄉitem陣列中
+                self.ColItems.forEach(function (element) {
+                  let param = {
+                    DBID: element.ColItemID,
+                    TicketColTitleID: data.TicketColTitle.DBID,
+                    Item: element.Item,
+                    Value: element.Value,
+                    DefaultFlag: 'Y',
+                    DeleteFlag: 'N',
+                    Sort: element.Sort
+                  }
+                  TicketColItem[0].TicketColItem.push(param)
+                })
 
+                self.createTicketColItem(JSON.stringify(TicketColItem)).then(function (data) {
+                  $('#openedit').modal('hide')
+                  self.reloadTemplateOpen()
+                  toastr.success('成功新增')
+                })
+              }
+            })
+            break
+          case '編輯欄位':
+            param = {
+              ticketColTitleID: self.OpenForm.ticketColTitleID,
+              title: self.OpenForm.Title,
+              ticketTemplateID: self.templateID,
+              type: 'castom',
+              // permID: '999',
+              titleType: self.OpenForm.TitleType,
+              isRequire: self.OpenForm.IsRequire,
+              defaultValue: '',
+              colType: 'Open',
+              sort: self.OpenForm.sort,
+              // mappingExt: '',
+              isSearchKey: 'Y',
+              description: self.OpenForm.description,
+              deleteFlag: 'N'
+            }
 
+            // 更新title後繼續更新item
+            self.updateTicketColTitle(param).then(function (data) {
+              if (data.Update_TicketColTitle) {
+                // 宣告item送出陣列
+                let TicketColItem = [
+                  {
+                    TicketColItem: [],
+                    DeleteTicketColItemList: []
+                  }
+                ]
+                //先存原本有ㄉ
+                if (self.copyColItems.length !== 0) {
+                  TicketColItem[0].DeleteTicketColItemList = self.copyColItems.map(function (element) {
+                    return element.ColItemID
+                  })
+                }
+                //將目前item插入送出ㄉitem陣列中
+                self.ColItems.forEach(function (element) {
+                  let param = {
+                    DBID: element.ColItemID,
+                    TicketColTitleID: data.Update_TicketColTitle.DBID,
+                    Item: element.Item,
+                    Value: element.Value,
+                    DefaultFlag: 'Y',
+                    DeleteFlag: 'N',
+                    Sort: element.Sort
+                  }
+                  TicketColItem[0].TicketColItem.push(param)
 
+                  let deleteIndex = TicketColItem[0].DeleteTicketColItemList.indexOf(
+                    element.ColItemID
+                  )
+                  if (deleteIndex !== -1) {
+                    TicketColItem[0].DeleteTicketColItemList.splice(deleteIndex, 1)
+                  }
+                })
 
+                TicketColItem[0].DeleteTicketColItemList = TicketColItem[0].DeleteTicketColItemList.map(
+                  function (element) {
+                    return { DBID: element }
+                  }
+                )
 
-        self.createTicketColItem(JSON.stringify(TicketColItem)).then(function(data) {
-          $('#openedit').modal('hide')
-          self.reloadTemplateOpen()
-          toastr.success('成功更新')
+                self.createTicketColItem(JSON.stringify(TicketColItem)).then(function (data) {
+                  $('#openedit').modal('hide')
+                  self.reloadTemplateOpen()
+                  toastr.success('成功更新')
+                })
+              }
+            })
+            break
+        }
+      },
+      updateTicketColTitle(param) {
+        let self = this
+        return APIManager.update('TicketColTitle').by(param)
+      },
+      createTicketColTitle(param) {
+        let self = this
+        return APIManager.insert('TicketColTitle').by(param)
+      },
+      createTicketColItem(TicketColItemData) {
+        let param = {
+          ticketColItemList: TicketColItemData
+        }
+        return APIManager.update('TicketColItem').by(param)
+      },
+      updateTicketColTitle(param) {
+        let self = this
+        return APIManager.update('TicketColTitle').by(param)
+      },
+      updateReply() {
+        const self = this
+      },
+      saveSource() { },
+      //  刪除
+      deleteTicketColTitle() {
+        const self = this
+        // console.log(self.checkedData)
+        self.checkedData.forEach(function (e) {
+          let param = {
+            ticketColTitleID: e.TicketColTitleID,
+            title: e.Title,
+            deleteFlag: 'Y',
+            ticketTemplateID: self.templateID,
+            type: 'castom'
+          }
+          APIManager.update('TicketColTitle')
+            .by(param)
+            .then(function (data) {
+              self.reloadTemplateOpen()
+              toastr.success('刪除成功')
+            })
         })
-      }
-    })
+      },
+      //  換欄位類型
+      changeTitleType() {
+        //有更換都變回1個item
+        const self = this
+        //清空item
+        self.ColItems.length = 0
 
-    break
-}
-    </script>
+        //  不顯示itemㄉitem
+        if (
+          self.OpenForm.TitleType !== 'input' ||
+          self.OpenForm.TitleType !== 'textarea' ||
+          self.OpenForm.TitleType !== 'timeYMD' ||
+          self.OpenForm.TitleType !== 'timeYMDHm' ||
+          self.OpenForm.TitleType !== 'timeHm'
+        ) {
+          self.createNewItemform()
+        }
+      },
+      removeThisItem(i) {
+        const self = this
+        if (self.ColItems.length > 1) {
+          self.ColItems.splice(i, 1)
+        } else {
+          toastr.error('剩下一筆不可刪除')
+        }
+      },
+      //  儲存排序
+      updateSort() {
+        const self = this
+        //防呆
+        if (self.TemplateOpenList.length === 0) {
+          return false
+        }
+        let array = []
+        self.TemplateOpenList.forEach(function (element, index) {
+          let param = {
+            id: element.TicketColTitleID,
+            sort: element.Sort
+          }
+          array.push(param)
+        })
+
+        APIManager.update('updateTicketColTitleSort')
+          .by({
+            ColTitleSortJson: JSON.stringify(array)
+          })
+          .then(function (data) {
+            self.reloadTemplateOpen()
+            toastr.success('更新成功')
+          })
+      },
+      updateItemSort(status, element, index) {
+        const self = this
+        console.log(self.ColItems[index])
+        switch (status) {
+          case 'up':
+            if (index !== 0) {
+              ;[self.ColItems[index].Sort, self.ColItems[index - 1].Sort] = [
+                self.ColItems[index - 1].Sort,
+                self.ColItems[index].Sort
+              ][(self.ColItems[index].Sort, self.ColItems[index - 1].Sort)] = [
+                  self.ColItems[index - 1].Sort,
+                  self.ColItems[index].Sort
+                ]
+            }
+            break
+          case 'down':
+            if (index !== self.ColItems.length - 1) {
+              ;[self.ColItems[index].Sort, self.ColItems[index + 1].Sort] = [
+                self.ColItems[index + 1].Sort,
+                self.ColItems[index].Sort
+              ][(self.ColItems[index].Sort, self.ColItems[index + 1].Sort)] = [
+                  self.ColItems[index + 1].Sort,
+                  self.ColItems[index].Sort
+                ]
+            }
+            break
+        }
+        //排序
+        self.ColItems = self.OpenTemplateSort(self.ColItems)
+      }
+    }
+
+  </script>
+
+
+  <script>
+
+    if (node.url && node.url.indexOf('info360CustomizedView') !== -1) {
+      let pervUrl = node.url.substring(0, node.url.lastIndexOf('/') + 1);
+      let page = getParameterByName('page', node.url);
+      if (pervUrl && page) {
+        let targetUrl = pervUrl + page;
+        let reqparams = getParameterByName('reqparams', node.url);
+        if (reqparams) {
+          //InfoTM_CurrentIxn
+          if (!Array.isArray(reqparams)) {
+            reqparams = reqparams.trim().split(' ')
+          }
+          reqparams = reqparams.map((param) => {
+            let ext = getParameterByName(param, node.url);
+            let val = InfoTM_CurrentIxn[ext] ? InfoTM_CurrentIxn[ext] : '';
+            return {
+              key: param,
+              val: val
+            }
+          });
+          reqparams.forEach((param) => {
+            targetUrl = updateQueryStringParameter(targetUrl, param.key, param.val);
+          });
+
+          let id = "TM-tabs-" + currentTabs.length;
+          let $TMTabContent = createTMTabContent(id, null, targetUrl);
+          let tab = createTMTab(node.name + currentTabs.length, id);
+          $('.TMTab-content').append($TMTabContent);
+          tab.find('a').trigger('click');
+        } else {
+          toastr.error(t('TMAgentSearch.ParameterSettingError'))
+        }
+
+      } else {
+        toastr.error(t('TMAgentSearch.LinkPageSettingError'))
+      }
+    } else {
+      $('.TMTabs-container>li>a').each(function (index, item) {
+        let text = $(item).text();
+        if (text == node.name) {
+          $(item).trigger('click');
+          isExist = true;
+          return false;
+        }
+      });
+      if (!isExist) {
+        let id = "TM-tabs-" + currentTabs.length;
+        let $TMTabContent = createTMTabContent(id, null, node.url);
+        let tab = createTMTab(node.name, id);
+        $('.TMTab-content').append($TMTabContent);
+        tab.find('a').trigger('click');
+      }
+    }
+  </script>
 </body>
+
 </html>
