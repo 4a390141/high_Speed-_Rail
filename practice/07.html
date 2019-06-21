@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="row">
+        <!--參照小組-->
+        <h4 class="form-group col-sm-12 activitysource" style="display: none;"></h4>
+        <!--按鈕-->
+        <div class="form-group col-sm-12 activityBtnStatus">
+            <div class="btn-group">
+                <button class="btn btn-outline btn-default m-r-xs dropdown-toggle" data-toggle="dropdown"
+                    aria-expanded="false">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    <span data-i18n="common.create"></span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li onclick="addPilotActivityTreeNode('after')"><a><span
+                                data-i18n="ActivityNew.CreateAfterNode"></span></a>
+                    </li>
+                    <li onclick="addPilotActivityTreeNode('inside')"><a><span
+                                data-i18n="ActivityNew.CreateInsideNode"></span></a>
+                    </li>
+                    <%--<li><a data-toggle="modal" data-target="#activitycopy">複製其他服務代碼</a>--%>
+                    <%--</li>--%>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-outline btn-default m-r-xs" onclick="jstreeSortObjSubmit('activity')">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true">
+                </span>
+                <span data-i18n="ActivityNew.SaveSort"></span>
+            </button>
+            <button type="button" class="btn btn-outline btn-default m-r-xs"
+                onclick="checkJSTreeAndShowModal('pilotActivityTree','activitydelete')">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                <span data-i18n="common.delete"></span>
+            </button>
+        </div>
+        <!--樹狀圖（需再加上root「服務代碼」,此層不可新增同層節點）-->
+        <div class="col-sm-12 scroller pillstacked-tab-btn">
+            <input type="hidden" id="pilotActivityTreeSelected">
+            <div id="pilotActivityTree"></div>
+        </div>
+    </div>
+
+    <script>
+        http://localhost:8080/info360/info360CustomizedView?name=Master
+
+createChatCommonLink
+
+    function converCommonLink(href,roomID) {
+
+
+
+        contactdata = roomIDMappingClientData[roomID].userData.userdata.contactdata
+        mappingArray = roomIDMappingClientData[roomID].userData.userdata.contactdata_colnamemapping
+        console.log(contactdata)
+        console.log(mappingArray)
+
+        //搜尋條件
+        mappingArray.forEach(function (element ,index) {
+            let key = element.mappingkey.toLowerCase()
+            console.log(key)
+            if (key in contactdata){
+                param = {
+                    key :  contactdata[key]
+                }
+            }
+            commonLinkData.push(param)
+        })
+
+        console.log(commonLinkData)
+
+        if (href && href.trim().length == 0) {
+            toastr.error(t('AgentWorkSpace.alert_noUrl'));
+            return;
+        }else if(href && href.indexOf('info360CustomizedView') !== -1){
+            const page = getParameterByName('page', href);
+            // const commonLinkData= roomIDMappingClientData[roomID].commonLink;
+            commonLinkData = []
+
+
+            //搜尋條件
+            mappingArray.forEach(function (element ,index) {
+                let key = element.mappingkey.toLowerCase()
+                console.log(key)
+                if (key in contactdata){
+                    param = {
+                        key :  contactdata[key]
+                    }
+                }
+                commonLinkData.push(param)
+            })
+
+            console.log(commonLinkData)
+
+            if(!page){
+                toastr.error(t('AgentWorkSpace.alert_linkError'));
+                return false;
+            }
+            let reqparams = getParameterByName('reqparams', href);
+            if (!Array.isArray(reqparams)) {
+                reqparams = reqparams.trim().split(' ');
+            }
+            reqparams = reqparams.map((param) => {
+                let key = getParameterByName(param, href);
+                let val = commonLinkData[key]? commonLinkData[key]: '';
+                return {
+                    key: param,
+                    val: val
+                }
+            });
+            let temphref= href.substring(0, href.indexOf('info360CustomizedView') ) + page;
+            reqparams.forEach(function(item, index){
+                if(index=== 0){
+                    temphref+='?';
+                }else{
+                    temphref+='&';
+                }
+                temphref+= item.key+ '=' + item.val;
+            });
+            href= temphref;
+
+        }
+        return href
+    }F
+    </script>
+</body>
+
+</html>
