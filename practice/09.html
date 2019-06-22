@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+
+
+
+       
+Vue.component('info360-mix-search', {
+  template: ` <div class="col-sm-12" style="padding: 15px;height: 100vh;">
+                        <tabs-main delete-trigger="true" @delete-triggered="hideHistoryDetail">
+                            <div slot="tabwrap">
+                                <tab-withshow  class="tab-pane"  :name="mutilChannelQuery.name"  :text="mutilChannelQuery.text" :is-active.sync="mutilChannelQuery.isActive">
+                                    <div slot="tabinner" class="row">
+                                        <div   id="mutilChannelQuery">
+                                            <!--Form-搜尋條件-->
+                                            <form id="mutilChannelQuery_Form">
+                                                <div class="row">
+                                                  <div class="form-group col-sm-3">
+                                                      <label class="col-sm-4 control-label labelcenter">{{t('c_info360_mixSearch.label_source')}}</label>
+                                                      <div class="col-sm-8 input-group">
+                                                          <select class="form-control" name="entityTypeID" :title="(t('c_info360_mixSearch.label_source'))" v-model="entityTypeID">
+                                                              <option value="All">{{t('c_info360_mixSearch.input_all')}}</option>
+                                                              <option v-for="entityType in entityTypeList" :value="entityType.value">{{entityType.name}}</option>
+                                                          </select>
+                                                      </div>
+                                                  </div>
+                                                  <div class="form-group col-sm-3 mutilChannelQuery_Hanlder">
+                                                      <label class="col-sm-4 control-label labelcenter">{{t('c_info360_mixSearch.label_person')}}</label>
+                                                      <div class="col-sm-8 input-group">
+                                                          <multiselect v-model="AgentID" selectLabel=""
+                                                                       :deselectLabel="(t('c_info360_mixSearch.input_remove'))" :placeholder="(t('c_info360_mixSearch.input_search'))" label="name"
+                                                                       track-by="code" :options="AgentOptions"
+                                                                       :multiple="false" :taggable="false">
+                                                              <span slot="noResult">{{t('c_info360_mixSearch.input_nobody')}}</span>
+                                                          </multiselect>
+                                                      </div>
+                                                  </div>
+                                                  <div class="form-group col-sm-3">
+                                                      <label class="col-sm-4 control-label labelcenter">{{t('c_info360_mixSearch.label_phone')}}</label>
+                                                      <div class="col-sm-8 input-group">
+                                                          <input type="text" class="form-control CallerID" name="VoiceQueueHistoryCallerID" autocomplete="off" v-model="CallerID">
+                                                      </div>
+                                                  </div>
+                                                  <div class="form-group col-sm-3">
+                                                      <label class="col-sm-3 control-label labelcenter">{{t('c_info360_mixSearch.label_specialNote')}}</label>
+                                                      <div class="col-sm-9 input-group">
+                                                          <input type="text" class="form-control" name="SpecialNote" autocomplete="off" v-model="specialNote">
+                                                      </div>
+                                                  </div>
+                                                </div>
+                                                <div class="row">
+                                                  <infobase-datetimepicker-group class="form-group col-sm-6" format="YYYY-MM-DD"
+                                                         :label="(t('c_info360_mixSearch.label_date'))" :label-col="2"
+                                                         inner-div-class="input-group"
+                                                         :start-value.sync="StartDate"
+                                                         :end-value.sync="EndDate"></infobase-datetimepicker-group>
+                                                  <div class="form-group col-sm-6">
+                                                      <label class="col-sm-2 control-label labelcenter">{{t('c_info360_mixSearch.label_clientInfo')}}</label>
+                                                      <div class="col-sm-10 input-group">
+                                                          <input type="text" name="customer" :placeholder="(t('c_info360_mixSearch.input_condition'))" autocomplete="off" class="form-control customerSearch" v-model="customerSearch">
+                                                          <div class="input-group-btn" style="z-index: 1">
+                                                              <button tabindex="-1" class="btn btn-default btn-outline searchOperation" type="button" @click.stop.prevent="toogleSearchOperation">
+                                                                 {{searchOperation}}
+                                                              </button>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                 </div>
+                                                <div class="mutilChannelQuery_DynamicSearchColumContent">
+                                                    <div class="form-group col-sm-3 pull-right">
+                                                        <button type="button" class="btn btn-outline btn-default pull-right" @click.stop.prevent="clearSearch">
+                                                            <i class="far fa-trash-alt"></i>
+                                                            <span>{{t('c_info360_mixSearch.btn_clear')}}</span>
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline btn-default pull-right m-r-xs" @click.stop.prevent="reloadSource(extraParam,true)">
+                                                            <i class="fas fa-search"></i>
+                                                            <span>{{t('c_info360_mixSearch.btn_search')}}</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <hr>
+                                            <!--Table-搜尋結果-->
+                                            <data-table v-if="entityTypeList.length>0" class="scroller col-sm-12"
+                                                        style="width:calc(100vw - 100px);height:calc(100vh - 220px);table-layout:fixed;overflow-x: auto;"
+                                                        :columns="DisplayNameMappingData" :fixed-header="false" :table-order="mixSearchOrder"
+                                                        :source="mixSearchResult"    @reload-data="reloadSource"  :pagination="true" :displayLength="rowLength"
+                                                        :records-total.sync="mixSearchRecordsTotal" :extra-param="extraParam"
+                                                        dom="l<'displayNone'B>rtip" @tr-click="clickRow">
+                                            </data-table>
+  
+ `,
+  props: {
+    tenantID: { required: true },
+    entityTypeList: { required: true },
+    typeID: { required: true }
+  },
+  data: function() {
+    return {
+      mutilChannelQuery: {
+        name: 'mutilChannelQuery',
+        text: t('c_info360_mixSearch.tab_history'),
+        isActive: true
+      },
+      openedDeatilList: [],
+      DisplayNameMappingData: [],
+      mixSearchResult: [],
+      mixSearchRecordsTotal: 0,
+      entityTypeID: 'All',
+      CallerID: '',
+      searchOperation: 'AND',
+      customerSearch: '',
+      specialNote: '',
+      StartDate: '',
+      EndDate: '',
+      extraParam: {},
+      catchSearch: {},
+      AgentID: undefined,
+      AgentOptions: [],
+      mixSearchOrder: [],
+      pageLimit: sessionStore.read('HD_DetailPaging_g')
+        ? parseInt(sessionStore.read('HD_DetailPaging_g'), 10)
+        : 5,
+      maxDetailCount: sessionStore.read('maxDetailCount_g')
+        ? parseInt(sessionStore.read('maxDetailCount_g'), 10)
+        : 5,
+      cusIxnLength: sessionStore.read('CusIxnLength_g')
+        ? parseInt(sessionStore.read('CusIxnLength_g'), 10)
+        : 10,
+      rowLength: sessionStore.read('DTMSpageLength_g')
+        ? parseInt(sessionStore.read('DTMSpageLength_g'), 10)
+        : 10,
+      MSDetailDisplayFormatNew: JSON.parse(sessionStore.read('MSDetailDisplayFormatNew_g')),
+      allTypeOptions: [],
+      searchKeyList: []
+    }
+  },
+  computed: {},
+  watch: {},
+  methods: {
+    uuid() {
+      function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+          .toString(16)
+          .substring(1)
+      }
+      return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+    },
+    showTicket(ixn) {
+      let self = this
+      if (self.openedDeatilList.length >= self.maxDetailCount) {
+        toastr.error(t('c_info360_mixSearch.alert_tabLimit'))
+        return
+      }
+      self.mutilChannelQuery.isActive = false
+      self.openedDeatilList.forEach(item => (item.isActive = false))
+      const nextKey =
+        self.openedDeatilList.reduce((result, item) => {
+          return result > item.key ? result : item.key
+        }, 0) + 1
+      self.openedDeatilList.push({
+        key: nextKey,
+        name: ixn.IxnID,
+        text: ixn.StartDate,
+        isActive: true,
+        tenantID: self.tenantID,
+        typeID: self.typeID,
+        entityTypeID: ixn.EntityTypeID,
+        contactID: ixn.ContactID,
+        ixnID: ixn.IxnID,
+        ixnData: ixn
+      })
+    },
+    clickRow(rowData) {
+      let self = this
+      if (self.openedDeatilList.length >= self.maxDetailCount) {
+        toastr.error(t('c_info360_mixSearch.alert_tabLimit'))
+        return
+      }
+      self.mutilChannelQuery.isActive = false
+      self.openedDeatilList.forEach(item => (item.isActive = false))
+      const nextKey =
+        self.openedDeatilList.reduce((result, item) => {
+          return result > item.key ? result : item.key
+        }, 0) + 1
+      // 把 data-table 的資料塞進去
+      self.openedDeatilList.push({
+        key: nextKey,
+        name: rowData.IxnID,
+        text: rowData.StartDate,
+        isActive: true,
+        tenantID: self.tenantID,
+        typeID: self.typeID,
+        entityTypeID: rowData.EntityTypeID,
+        contactID: rowData.ContactID,
+        ixnID: rowData.IxnID,
+        ixnData: rowData
+      })
+    },
+    toogleSearchOperation() {
+      let self = this
+      if (self.searchOperation !== 'AND') {
+        self.searchOperation = 'AND'
+      } else {
+        self.searchOperation = 'OR'
+      }
+    },
+    initAgentOptions: function() {
+      let self = this
+      APIManager.get('PersonList')
+        .by({ tenantID: self.tenantID, entityTypeID: 2 })
+        .then(function(data) {
+          data.Cfg_Person.forEach(function(item, index, array) {
+            const tag = {
+              name: item.USER_NAME,
+              code: item.DBID
+            }
+            self.AgentOptions.push(tag)
+          })
+        })
+    },
+    initDisplayNameMappingData() {
+      let self = this
+      APIManager.get('DisplayNameMappingData')
+        .by({})
+        .then(({ DisplayNameMappingData }) => {
+          // 抓出 API response 中的 DisplayNameMappingData，mapping 成 data-table 套件可以吃的格式，再塞進 data.DisplayNameMappingData
+          self.DisplayNameMappingData = self.getColDef(
+            DisplayNameMappingData.filter(item => parseInt(item.ShowFlag) === 1).map(function(
+              item,
+              index,
+              arr
+            ) {
+              return {
+                data: null,
+                aTargets: index,
+                width: '150px',
+                className: '',
+                sTitle: item.DisplayName,
+                orderable: false,
+                render: function(data, type, full, meta) {
+                  // full 所對應到的，是該筆資料的所有混查 property
+                  // item 的 ContactTagData 是由所有相同 MappingKey 的資料組成的陣列
+                  // 例如該 item 的 DisplayName 為 RentID，其 ContactTagData 中包含所有 MappingKey 為 ExtendField01 的資料
+                  // data 如果是 null，會和 full 一樣是一個包含所有混查 property 的物件
+                  // 如果有值，則會在 full 中找到該 property，並把它抽出來
+                  if (!item.ContactTagData) {
+                    return ''
+                  }
+                  let temp = item.ContactTagData.find(
+                    Tag =>
+                      parseInt(Tag.EntityTypeID) === parseInt(full.EntityTypeID) &&
+                      parseInt(Tag.ContactGroupID) === parseInt(full.ContactGroupID)
+                  )
+                  if (temp && temp.MappingKey && full[temp.MappingKey]) {
+                    return full[temp.MappingKey]
+                  }
+                  return ''
+                },
+                defaultContent: ''
+              }
+            })
+          )
+          self.mixSearchOrder = [
+            [
+              DisplayNameMappingData.filter(item => parseInt(item.ShowFlag) === 1).length + 1,
+              'desc'
+            ]
+          ]
+          console.log(self.DisplayNameMappingData)
+          self.addColSpecialNotes()
+        })
+    },
+    // 將固定欄位陣列接在不固定欄位陣列後面
+    getColDef(prev) {
+      let self = this
+      return prev.concat([
+        {
+          aTargets: prev.length,
+          data: 'VoiceQueueHistoryCallerID',
+          width: '150px',
+          className: '',
+          sTitle: t('c_info360_mixSearch.subTitle_phone'),
+          orderable: true,
+          render: function(data, type, full, meta) {
+            return data ? data : t('c_info360_mixSearch.none')
+          },
+          defaultContent: t('c_info360_mixSearch.none')
+        },
+        {
+          aTargets: prev.length + 1,
+          data: 'StartDate',
+          width: '150px',
+          className: '',
+          sTitle: t('c_info360_mixSearch.subTitle_startTime'),
+          orderable: true,
+          render: function(data, type, full, meta) {
+            return data ? data : t('c_info360_mixSearch.none')
+          },
+          defaultContent: t('c_info360_mixSearch.none')
+        },
+        {
+          aTargets: prev.length + 2,
+          data: 'EndDate',
+          sTitle: t('c_info360_mixSearch.subTitle_finishTime'),
+          className: '',
+          width: '150px',
+          orderable: true,
+          render: function(data, type, full, meta) {
+            return data ? data : t('c_info360_mixSearch.none')
+          },
+          defaultContent: t('c_info360_mixSearch.none')
+        },
+        {
+          aTargets: prev.length + 3,
+          data: 'EntityTypeID',
+          sTitle: t('c_info360_mixSearch.subTitle_source'),
+          className: '',
+          width: '150px',
+          orderable: true,
+          render: function(data, type, full, meta) {
+            let Entity = [
+              { EntityTypeID: '1', EntityName: 'Voice' },
+              { EntityTypeID: '2', EntityName: 'Chat-Web' },
+              { EntityTypeID: '11', EntityName: 'HelpDesk' },
+              { EntityTypeID: '10', EntityName: 'TM' }
+            ]
+
+            data = Entity.find(item => item.EntityTypeID == data)
+
+            return data ? data.EntityName : t('c_info360_mixSearch.none')
+          },
+          defaultContent: ''
+        },
+        {
+          aTargets: prev.length + 4,
+          data: 'AgentID',
+          sTitle: t('c_info360_mixSearch.subTitle_person'),
+          className: '',
+          width: '150px',
+          orderable: true,
+          render: function(data, type, row) {
+            console.log(`AgentID${data}`)
+            return personMappingByDBID[data] ? personMappingByDBID[data] : ''
+          },
+          defaultContent: ''
+        },
+        {
+          aTargets: prev.length + 5,
+          data: 'ActivityDataNames',
+          className: '',
+          sTitle: t('c_info360_mixSearch.subTitle_code'),
+          orderable: true,
+          width: '150px',
+          defaultContent: '',
+          render: function(data, type, row) {
+            let result = ''
+            if (data) {
+              let dataArr = data.split(',')
+              dataArr.pop()
+              result = dataArr.join('、')
+            }
+            return result
+          }
+        }
+        // {
+        //     "aTargets": prev.length + 6,
+        //     "data": "IxnID",//系統預設名稱
+        //     "orderable": "true",
+        //     visible: false,
+        // },
+      ])
+    },
+    // 變動欄位 + 固定欄位後，若有啟用的 specialNote，再加上特殊註記的欄位
+    addColSpecialNotes() {
+      let self = this
+      APIManager.get('SpecialNote')
+        .by({ tenantID: sessionStore.read('tenantID_g'), typeID: sessionStore.read('typeID_g') })
+        .then(({ CallLogTagData }) => {
+          self.DisplayNameMappingData = self.DisplayNameMappingData.concat(
+            CallLogTagData.filter(item => item.enable === '1').map((item, index) => {
+              return {
+                data: null,
+                aTargets: self.DisplayNameMappingData.length + index,
+                width: '150px',
+                className: '',
+                sTitle: item.displayName,
+                orderable: false,
+                render: function(data, type, full, meta) {
+                  if (!full.CallLogTag || full.CallLogTag.length <= 0) {
+                    return ''
+                  }
+                  let target = full.CallLogTag.find(function(el) {
+                    // el => 目前資料
+                    // item => 目前的 thead 資訊
+                    return el.CallLogTagID === item.dbid
+                  })
+                  if (!target) {
+                    return ''
+                  }
+                  return target.Value
+                },
+                defaultContent: ''
+              }
+            })
+          )
+          // let enableArr = CallLogTagData.filter(item => item.enable === '1')
+          // enableArr = enableArr.map((item, index) => {
+          //   return {
+          //     data: null,
+          //     aTargets: arr.length + index,
+          //     width: '150px',
+          //     className: '',
+          //     sTitle: item.displayName,
+          //     orderable: true,
+          //     render: function(data, type, full, meta) {
+          //       return data ? data : t('c_info360_mixSearch.none')
+          //     },
+          //     defaultContent: ''
+          //   }
+          // })
+          // let allArr = arr.concat(enableArr)
+          // console.log('enableArr testing')
+          // console.log(allArr)
+          // self.DisplayNameMappingData = allArr
+          // console.log(this.DisplayNameMappingData)
+          console.log(self.DisplayNameMappingData)
+        })
+    },
+    hideHistoryDetail(tabIndex) {
+      let self = this
+      self.mutilChannelQuery.isActive = true
+      self.openedDeatilList = self.openedDeatilList.filter((item, index) => index !== tabIndex - 1)
+    },
+    getNewSearchCommand() {
+      let vm = this
+      let subCommand = ''
+
+      vm.catchSearch = {
+        EntityTypeID: vm.entityTypeID,
+        AgentID: vm.AgentID ? vm.AgentID.code : 'All',
+        CallerID: vm.CallerID,
+        searchOperation: vm.searchOperation,
+        specialNote: vm.specialNote.split(' ').filter(item => item !== ''),
+        customerSearch: vm.customerSearch.split(' ').filter(item => item !== ''),
+        StartDate: vm.StartDate.length === 0 ? '*' : vm.StartDate,
+        EndDate: vm.EndDate.length === 0 ? '*' : vm.EndDate + 'T23:59:59'
+      }
+      if (vm.catchSearch.customerSearch.length > 0) {
+        subCommand += '('
+        vm.catchSearch.customerSearch.forEach(function(value, index, ar) {
+          if (index !== 0) {
+            subCommand += ' ' + vm.catchSearch.searchOperation + ' '
+          }
+          subCommand += 'customer: *' + value + '* '
+        })
+        subCommand += ' ) '
+      }
+      if (vm.catchSearch.specialNote.length > 0) {
+        subCommand += '('
+        vm.catchSearch.specialNote.forEach(function(value, index, ar) {
+          if (index !== 0) {
+            subCommand += ' ' + vm.catchSearch.searchOperation + ' '
+          }
+          subCommand += `CallLogTag:*<Value>${value}</Value>*`
+        })
+        subCommand += ')'
+      }
+      let queryParam = {
+        StartDate: '[' + vm.catchSearch.StartDate + ' TO ' + vm.catchSearch.EndDate + ']',
+        subCommand: subCommand
+      }
+
+      if (vm.catchSearch.AgentID === 'All' && vm.catchSearch.EntityTypeID === 'All') {
+        queryParam['IxnID'] = '["" TO *]'
+      }
+      if (vm.catchSearch.CallerID.trim().length !== 0) {
+        queryParam['VoiceQueueHistoryCallerID'] = vm.catchSearch.CallerID
+      }
+      if (vm.catchSearch.AgentID !== 'All') {
+        queryParam['AgentID'] = vm.catchSearch.AgentID
+      }
+      if (vm.catchSearch.EntityTypeID !== 'All') {
+        queryParam['EntityTypeID'] = vm.catchSearch.EntityTypeID
+      } else {
+        if (subCommand.length > 0) {
+          subCommand += ' AND'
+        }
+        subCommand += ' ('
+        vm.entityTypeList.forEach(function(item, index) {
+          if (index > 0) {
+            subCommand += ' OR '
+          }
+          subCommand += 'EntityTypeID:' + item.value
+        })
+        subCommand += ')'
+        queryParam['subCommand'] = subCommand
+      }
+      return Object.entries(queryParam).reduce((perv, [objectKey, objectVal], index) => {
+        if (objectKey === 'subCommand' && objectVal) {
+          if (index !== 0 && perv.length > 0) {
+            perv += ' AND '
+          }
+          perv += objectVal
+        } else if (objectKey !== 'subCommand') {
+          if (index !== 0 && perv.length > 0) {
+            perv += ' AND '
+          }
+          perv += objectKey + ':' + objectVal
+        }
+        return perv
+      }, '')
+    },
+    getCatchSearchCommand() {
+      let vm = this
+      let subCommand = ''
+      if (vm.catchSearch.customerSearch.length > 0) {
+        subCommand += '('
+        vm.catchSearch.customerSearch.forEach(function(value, index, ar) {
+          if (index !== 0) {
+            subCommand += ' ' + vm.catchSearch.searchOperation + ' '
+          }
+          subCommand += 'customer: *' + value + '* '
+        })
+        subCommand += ' ) '
+      }
+      if (vm.catchSearch.specialNote.length > 0) {
+        subCommand += '('
+        vm.catchSearch.specialNote.forEach(function(value, index, ar) {
+          if (index !== 0) {
+            subCommand += ' ' + vm.catchSearch.searchOperation + ' '
+          }
+          subCommand += `CallLogTag:*<Value>${value}</Value>*`
+        })
+        subCommand += ')'
+      }
+      let queryParam = {
+        StartDate: '[' + vm.catchSearch.StartDate + ' TO ' + vm.catchSearch.EndDate + ']',
+        subCommand: subCommand
+      }
+
+      if (vm.catchSearch.AgentID === 'All' && vm.catchSearch.EntityTypeID === 'All') {
+        queryParam['IxnID'] = '["" TO *]'
+      }
+      if (vm.catchSearch.CallerID.trim().length !== 0) {
+        queryParam['VoiceQueueHistoryCallerID'] = vm.catchSearch.CallerID
+      }
+      if (vm.catchSearch.AgentID !== 'All') {
+        queryParam['AgentID'] = vm.catchSearch.AgentID
+      }
+      if (vm.catchSearch.EntityTypeID !== 'All') {
+        queryParam['EntityTypeID'] = vm.catchSearch.EntityTypeID
+      } else {
+        if (subCommand.length > 0) {
+          subCommand += ' AND'
+        }
+        subCommand += ' ('
+        vm.entityTypeList.forEach(function(item, index) {
+          if (index > 0) {
+            subCommand += ' OR '
+          }
+          subCommand += 'EntityTypeID:' + item.value
+        })
+        subCommand += ')'
+        queryParam['subCommand'] = subCommand
+      }
+      return Object.entries(queryParam).reduce((perv, [objectKey, objectVal], index) => {
+        if (objectKey === 'subCommand' && objectVal) {
+          if (index !== 0 && perv.length > 0) {
+            perv += ' AND '
+          }
+          perv += objectVal
+        } else if (objectKey !== 'subCommand') {
+          if (index !== 0 && perv.length > 0) {
+            perv += ' AND '
+          }
+          perv += objectKey + ':' + objectVal
+        }
+        return perv
+      }, '')
+    },
+    // 點擊搜尋的時候會觸發
+    reloadSource(extraParam, resetExtraParam) {
+      let vm = this
+      vm.extraParam = extraParam
+      if (resetExtraParam || extraParam.page === undefined) {
+        vm.extraParam.page = 0
+        vm.extraParam.start = 1
+        vm.extraParam.sortColum = 'StartDate'
+        vm.extraParam.sortType = 'desc'
+      }
+      if (vm.entityTypeList.length === 0) {
+        toastr.error(t('c_info360_mixSearch.alert_management'))
+        return false
+      }
+      if (vm.EndDate.length > 0 && vm.StartDate.length === 0) {
+        toastr.error(t('c_info360_mixSearch.alert_startTime'))
+        return false
+      }
+      let command = ''
+      if (!resetExtraParam && Object.getOwnPropertyNames(vm.catchSearch).length > 1) {
+        command = vm.getCatchSearchCommand()
+      } else {
+        command = vm.getNewSearchCommand()
+      }
+      command = command.length > 0 ? "ContactID:['' TO *] AND " + command : "ContactID:['' TO *]"
+      return APIManager.get('MultipleChannelData')
+        .by({
+          page: vm.extraParam.page,
+          size: vm.rowLength,
+          sortColum: vm.extraParam.sortColum,
+          sortType: vm.extraParam.sortType,
+          tenantID: vm.tenantID,
+          searchType: 'command',
+          searchCommand: commandㄑ
+        })
+        .then(data => {
+          // 共有多少筆資料
+          vm.mixSearchRecordsTotal = data.HistoryMixedSearch_Core_TotalElements
+          // 列舉十筆資料
+          vm.mixSearchResult = data.HistoryMixedSearch_Core
+        })
+    },
+    clearSearch() {
+      let self = this
+
+      self.entityTypeID = 'All'
+      self.CallerID = ''
+      self.AgentID = undefined
+      self.searchOperation = 'AND'
+      self.customerSearch = ''
+      self.specialNote = ''
+      self.StartDate = ''
+      self.EndDate = ''
+    },
+    initAllTypeOptions: function() {
+      const self = this
+      APIManager.get('SelectTypeByTenantID')
+        .by({ tenantID: self.tenantID })
+        .then(function(data) {
+          data = ObjectKeysToLowerCase(data)
+          let firstContactData = data.contactdata_setting.shift()
+          self.allTypeOptions.push(firstContactData)
+        })
+    },
+    getSearchKeyList: function() {
+      let self = this
+      let param = {
+        tenantID: self.tenantID,
+        typeID: self.typeID
+      }
+      APIManager.get('ContactDataColSearchKey')
+        .by(param)
+        .then(function(data) {
+          self.searchKeyList = data.ContactDataColSearchKey
+        })
+    }
+  },
+  mounted() {
+    let self = this
+    self.initDisplayNameMappingData()
+    self.initAgentOptions()
+    self.initAllTypeOptions()
+    self.getSearchKeyList()
+    // 假資料，chartConfig
+    // let sessionStore = new sessionStoreUtil
+    // let config = JSON.stringify({channel: [1, 2, 11]})
+    // sessionStore.write('chartConfig', config)
+  }
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
