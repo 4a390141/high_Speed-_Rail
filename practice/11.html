@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+
+        let tempArray=[
+            {
+                "data": null,
+                "width": "320px",
+                "sTitle": t('RecordSearch.Play'),
+                "orderable": false,
+                "render": function (data, type, full, meta) {
+                    let fileArray=full.AudioURL.split("/");
+                    let downloadUrl=fileArray.join("_");
+                    let timeStamp=new Date().getTime();
+                    return  `<audio    controls="" controlsList="nodownload" oncontextmenu="return false" preload="none" >
+                                <source src="/info360/WavLoader?fileName=\${downloadUrl}&personID=\${agentID}&logKey=\${full.LogKey}&actionType=2&caller=\${full.Caller}&callee=\${full.Callee}&telNo=\${full.TelNo}&autoNo=\${full.AutoNo}&tenantID=\${tenantID}&timeStamp=\${timeStamp}" type="audio/mpeg">
+                            </audio>`;
+        
+                },
+            },
+            {
+                "data": 'IO',
+                "width": "100px",
+                "sTitle": t('RecordSearch.LineType'),
+                "render": function (data, type, full, meta) {
+                    return data ? data : t('common.nothing');
+                },
+            },
+            {
+                "data": 'StartDateTime',
+                "width": "12%",
+                "sTitle": t('common.StartingTime'),
+                "render": function (data, type, full, meta) {
+                    return data? data : t('common.nothing');
+        
+                },
+            },
+            {
+                "data": 'EndDateTime',
+                "width": "12%",
+                "sTitle": t('common.EndTime'),
+                "render": function (data, type, full, meta) {
+                    return data? data : t('common.nothing');
+                },
+            },
+            {
+                "data": 'LogKey',
+                "width": "12%",
+                "sTitle": t('RecordSearch.SerialNumber'),
+                "render": function (data, type, full, meta) {
+                    return data ? data : t('common.nothing');
+                },
+            },
+            {
+                "data": 'Caller',
+                "width": "130px",
+                "sTitle": t('RecordSearch.RecordingObject'),
+                "render": function (data, type, full, meta) {
+                    return data ? data : t('common.nothing');
+                },
+            },
+            {
+                "data": 'Callee',
+                "width": "100px",
+                "sTitle": t('RecordSearch.callObject'),
+                "render": function (data, type, full, meta) {
+                    return data ? data : t('common.nothing');
+                },
+            },
+            {
+                "data": 'TelNo',
+                "width": "120px",
+                "sTitle": t('RecordSearch.telephoneNumber'),
+                "render": function (data, type, full, meta) {
+                    return data ? data : t('common.nothing');
+                },
+            },
+            {
+                "data": 'DIDNo',
+                "width": "100px",
+                "sTitle": t('RecordSearch.DIDnumber'),
+                "render": function (data, type, full, meta) {
+                    return data ? data : t('common.nothing');
+                },
+            },
+            {
+                "data": 'FileSize',
+                "width": "100px",
+                "sTitle": t('RecordSearch.FileSize'),
+                "render": function (data, type, full, meta) {
+                    if(type === "display"){
+                        return data? data+'KB': '0KB';
+                    }else{
+                        return data? parseFloat(data) : 0;
+                    }
+                },
+            },
+            {
+                "data": 'FileLen',
+                "width": "100px",
+                "sTitle": t('RecordSearch.RecordingTime'),
+                "render": function (data, type, full, meta) {
+                    if(type === "display"){
+                        return data? data+'秒': '0秒';
+                    }else{
+                        return data? parseFloat(data) : 0;
+                    }
+                },
+            },
+            {
+                "data": 'FileName',
+                "width": "12%",
+                "sTitle": t('RecordSearch.FileName'),
+                "render": function (data, type, full, meta) {
+                    return data ? data : t('common.nothing');
+                },
+            },
+            {
+                "data": null,
+                "width": "70px",
+                "sTitle": t('RecordSearch.download'),
+                "orderable": false,
+                "render": function (data, type, full, meta) {
+                    let fileArray=full.AudioURL.split("/");
+                    let downloadUrl=fileArray.join("_");
+        
+                    return `<a href="/info360/WavLoader?fileName=\${downloadUrl}&personID=\${agentID}&logKey=\${full.LogKey}&actionType=3&caller=\${full.Caller}&callee=\${full.Callee}&telNo=\${full.TelNo}&autoNo=\${full.AutoNo}&tenantID=\${tenantID}"  download="\${full.FileName}"><i class="fas fa-download"></i></a>`;
+                },
+            },
+        ];
+
+        if(!PlayFunction){
+                    tempArray.shift();
+                }
+                if(!DownloadFunction){
+                    tempArray.pop();
+                }
+
+    </script>
+</body>
+
+</html>

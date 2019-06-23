@@ -90,46 +90,30 @@
         var search_list = document.getElementsByClassName('search_list')[0];
         var tag = document.getElementsByClassName('tag');
         var searchArr = [];
-        var html = '';
+        
        
         for(var s=0;s<tag.length;s++){
             tag[s].addEventListener('click',searchTag);
-      
         }
-        // 可行
-        // function searchTag(){
-        //     var title = this.innerHTML;
-        //     var searchArr = searchData[title]; 
-        //     html = '';
-        //     search_list.innerHTML = '';
-        //     for(var i = 0; i < searchArr.length;i++){
-        //         html += '<div class="item">'
-        //         html += '<a href="javascript:;" target="_blank" class="title">'+searchArr[i].title+'</a>'
-        //         html += '<a href="' +searchArr[i].link+ 'target="_blank" class="link" >'+searchArr[i].link+'</a>'
-        //         html += '<p>'+searchArr[i].text+'</p>'
-        //         html += '</div>'    
-        //     }
-        //     search_list.innerHTML = html;
-            
-        // }
-        //  以下分開寫就失效
+
         function Domrender(searchArr){
-            console.log(searchArr)
-            html = '';
+
+            let html = '';
             search_list.innerHTML = '';
-            for(var i = 0; i < searchArr.length;i++){
-                html += '<div class="item">'
-                html += '<a href="javascript:;" target="_blank" class="title">'+searchArr[i].title+'</a>'
-                html += '<a href="' +searchArr[i].link+ 'target="_blank" class="link">https://zh.wikipedia.org/zh-tw/台灣媽祖信仰</a>'
-                html += '<p>'+searchArr[i].text+'</p>'
-                html += '</div>'    
+            for(let i = 0; i < searchArr.length;i++){
+
+                html = `
+                        <div class="item">
+                            <a href="javascript:;" target="_blank" class="title"> ${searchArr[i].title}</a>
+                            <a href=" ${searchArr[i].link} target="_blank" class="link">https://zh.wikipedia.org/zh-tw/台灣媽祖信仰 </a>
+                            <p>${searchArr[i].text}</p>
+                        </div>
+                `
             }
             search_list.innerHTML = html;
         }
         function searchTag(){
-            var title = this.innerHTML;
-            var searchArr = searchData[title]; 
-            Domrender(searchArr);
+            Domrender(searchData[this.innerHTML]);
         }
     </script>
     <!-- 疑問 -->
