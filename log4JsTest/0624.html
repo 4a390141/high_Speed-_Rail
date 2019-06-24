@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script type="text/javascript" src="../log4javascript-1.4.13/log4javascript-1.4.13/log4javascript.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="iii">asd</button>
+    <script>
+        var a = 1
+        var iii = document.getElementById('iii')
+        iii.addEventListener('click',ooxx)
+        function ooxx() {
+            setTimeout(function () {
+                a++
+                log.info(a)
+            }, 1000)
+        }
+
+
+        var log = log4javascript.getDefaultLogger();
+        // log.trace(message[, message2, ... ][, exception])
+        // log.debug(message[, message2, ... ][, exception])
+        // log.info(message[, message2, ... ][, exception])
+        // log.warn(message[, message2, ... ][, exception])
+        // log.error(message[, message2, ... ][, exception])
+        // log.fatal(message[, message2, ... ][, exception])
+
+    </script>
+</body>
+
+</html>
