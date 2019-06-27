@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <!-- jQ -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .box {
+            width: 100px;
+            height: 100px;
+            background: blue;
+            position: absolute;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="app">
+        <monitor-conversation-modal></monitor-conversation-modal>
+    </div>
+
+
+    <div>
+        <div id="satisFactionDetailModal" data-backdrop="static" data-keyboard="false" class="modal inmodal fade"
+            style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header"><button type="button" aria-hidden="true" class="close">×</button>
+                        <h4 class="modal-title">詳細交談內容</h4>
+                    </div>
+                    <div class="modal-body scroller">
+                        <div class="row">
+                            <div class="small-chat-box" style="height: 300px;">
+                                <div class="content scroller">
+                                    這裡是文字
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline btn-default">
+                            <i class="fas fa-times"></i>
+                            <span>關閉</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <script>
+        Vue.component('monitor-conversation-modal', {
+            data() {
+                return {}
+            },
+            template: `
+            `
+        })
+        const app = new Vue({
+            el: '#app',
+            data: {},
+            mounted() { },
+        })
+
+    </script>
+</body>
+
+</html>

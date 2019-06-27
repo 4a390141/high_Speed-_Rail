@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="satisFactionDetailModal" data-backdrop="static" data-keyboard="false" class="modal inmodal fade" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><button type="button" aria-hidden="true" class="close">×</button>
+                    <h4 class="modal-title">詳細交談內容</h4>
+                </div>
+                <div class="modal-body scroller">
+                    <div class="row">
+                        <div class="small-chat-box" style="height: 300px;">
+                            <div class="content scroller">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline btn-default"><i
+                            class="fas fa-times"></i> <span>關閉</span>
+                        <!----></button></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <button class="btn btn-outline btn-primary btn-xs">
+        詳細交談內容
+    </button>
+
+
+    <script>
+
+        self.tempHeaders.push({
+            "aTargets": index++,
+            "data": '',
+            "width": "100px",
+            "className": "",
+            "sTitle": '詳細交談內容',
+            "orderable": false,
+            "render": function (data, type, full, meta) {
+                return `    <button class="btn btn-outline btn-primary btn-xs" >`
+                    + t('c_info360_ixnContent.btn_detail') +
+                    `</button>`
+            },
+            "defaultContent": '',
+        })
+
+
+        console.log('websocket 段開: ' + e.code + ' ' + e.reason + ' ' + e.wasClean + ' ' + e.currentTarget.url)
+    </script>
+
+
+
+
+    <script>
+
+        let teplate = `<div class=\"left\"><div class=\"author-name\"><span class=\"chat-name\">系統訊息</span> <small class=\"chat-date\">15:59</small></div><div class=\"chat-message\">承暉資訊:xxxHI進入交談模式</div></div><div class=\"left\"><div class=\"author-name\"><span class=\"chat-name\">xxx</span> <small class=\"chat-date\">15:59</small></div><div class=\"chat-message\">xxxxxx</div></div><div class=\"right\"><div class=\"author-name\">   <span class=\"chat-name\"></span>    <small class=\"chat-date\">15:59</small></div><div class=\"chat-message active\">xxxxx</div></div><div class=\"left\">\n                            <div class=\"author-name\">\n                                <span class=\"chat-name\">系統訊息</span>\n                                <small class=\"chat-date\">16:01</small>\n                            </div>\n                            <div class=\"chat-message\">承暉資訊:HI交談結束~</div>\n                           </div>`
+
+        let body = document.getElementsByTagName('body')[0]
+        body.innerHTML = teplate
+    </script>
+
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>JS拖拽</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      
+    }
+
+    .box {
+      width: 300px;
+      height: 350px;
+      background: lightblue;
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+    }
+    #header{
+      width: 100%;
+      height: 10%;
+      background: darkseagreen;
+    }
+  </style>
+  <script>
+    /*******
+      拖拽原理：
+      拖拽状态 = false
+      鼠标在元素上按下的时候 {
+         拖拽状态 = true
+         记录下鼠标的x和y坐标
+         记录下元素的x和y坐标
+         元素的偏移值X=元素的X-元素的offsetLeft
+         元素的偏移值Y=元素的Y-元素的offsetTop
+      }
+      鼠标在元素上移动的时候 {
+         如果拖拽状态是false就什么也不做。
+         如果拖拽状态是true， 那么
+         元素y = 现在鼠标y -元素的偏移值X
+         元素x = 现在鼠标x -元素的偏移值Y
+      }
+      鼠标在任何时候放开的时候 {
+         拖拽状态 = false
+      }
+      将以上思路翻译成JS代码就可以实现拖拽的效果了。
+   *******/
+    var isDown = false;
+    var ObjLeft, ObjTop, posX, posY, obj, offsetX, offsetY,ooxx;
+    //初始化鼠标事件
+    window.onload = function () {
+      obj = document.getElementById('header');
+      ooxx = document.getElementById('box');
+
+
+      obj.onmousedown = down;
+      document.onmousemove = move;
+      document.onmouseup = up;
+    }
+    //  鼠标按键被按下时发生
+    function down(event) {
+      obj.style.cursor = "move";
+      isDown = true;
+      //     获取目标元素的原始位置
+      ObjLeft = ooxx.offsetLeft;
+      ObjTop = ooxx.offsetTop;
+      posX = parseInt(mousePosition(event).x);
+      posY = parseInt(mousePosition(event).y);
+      //元素的偏移值,即鼠标的位置跟元素的初始位置的距离。
+      offsetX = posX - ObjLeft;
+      offsetY = posY - ObjTop;
+    }
+    //鼠标指针移动时发生
+    function move(event) {
+      if (isDown == true) {
+        var x = mousePosition(event).x - offsetX
+        var y = mousePosition(event).y - offsetY
+        //document.documentElement.clientWidth网页可见区域宽
+        var w = document.documentElement.clientWidth - obj.offsetWidth;
+        var h = document.documentElement.clientHeight - obj.offsetHeight;
+        console.log(x + ',' + y);
+        //选取可见区域的值，避免拖动超出可见范围。
+        x = Math.min(w, Math.max(0, x));
+        y = Math.min(h, Math.max(0, y));
+        // ooxx.style.transform = `translate(${x}px,${y}px)`
+        ooxx.style.left = x + 'px';
+        ooxx.style.top = y + 'px';
+        ooxx.style.margin = 'unset';
+      }
+    }
+    //  鼠标按键被松开时发生
+    function up() {
+      isDown = false;
+    }
+
+    function mousePosition(evt) {
+      var xPos, yPos;
+      evt = evt || window.event;
+      //    PageX:鼠标在页面上的位置,从页面左上角开始,即是以页面为参考点,不随滑动条移动而变化
+      if (evt.pageX) {
+        xPos = evt.pageX;
+        yPos = evt.pageY;
+      }
+      //    clientX:鼠标在页面上可视区域的位置,从浏览器可视区域左上角开始,即是以浏览器滑动条此刻的滑动到的位置为参考点,随滑动条移动 而变化.
+      else {
+        xPos = evt.clientX + document.body.scrollLeft - document.body.clientLeft;
+        yPos = evt.clientY + document.body.scrollTop - document.body.clientTop;
+      }
+      return {
+        x: xPos,
+        y: yPos
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <div id="box" class="box">
+    <div id="header">這是標題</div>
+    <div id="boxBody">這是身體</div>
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+  <div>
+    sdfghjkl;lkjhgfdfgjkl;lkjhgfghjkl
+  </div>
+</body>
+
+</html>
