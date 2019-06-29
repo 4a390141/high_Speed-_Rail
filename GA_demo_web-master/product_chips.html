@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="style.css">
+    <script src='jquery-3.4.1.min.js'></script>
+    <title>DemoSite-Chips</title>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <div class="logo">
+                <a href="index.html" id="logo">
+                    <img src="index_img/logo.png" alt="">
+                </a>
+            </div>
+            <nav>
+                <a href="index.html" class="home" id='home'>
+                    Home
+                </a>
+                <a href="cart.html" class="cart" id='cart' target="_blank">
+                    <div class="cart_count"></div>
+                    <img src="index_img/cart.svg" alt="">
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="wrap pro-wrap">
+        <div class="pro-flex">
+            <div class="pro-pic">
+                <img src="index_img/chips.svg" alt="">
+            </div>
+            <div class="pro-line"></div>
+            <div class="pro-content">
+                <h2 class="pro-title">Chips</h2>
+                <p class="pro-text">Lorem ipsum dolor sit amet, 
+                    consectetur adipiscing elit.
+                    Maecenas fermentum, magna ut luctus hendrerit, 
+                    quam turpis accumsan nunc, quis vehicula
+                    nunc ligula at turpis. Vestibulum tincidunt
+                    velit eu enim dictum.</p>
+                <p class="pro-price">$2500</p>
+                <div class="pro-input">
+                    <input type="button" value="Add to cart" class="addCart" data-action="proAddCartBtn" id="Chips">
+                    <a href="cart.html"  target="_blank">
+                        <input type="button" value="Check cart" class="checkCart">
+                    </a>
+                </div>     
+            </div>
+        </div>
+    </div>  
+    <script src="product.js"></script>
+    <script>
+        const chipsAddtoCartBtn = document.querySelector('#Chips');
+        chipsAddtoCartBtn.addEventListener('click',productAddtoCart);
+    </script>
+    
+</body>
+</html>

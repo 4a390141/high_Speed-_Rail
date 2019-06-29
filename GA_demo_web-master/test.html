@@ -1,0 +1,87 @@
+<!DOCTYPE html>        
+<html lang="en">        
+<head>        
+    <meta charset="UTF-8">        
+    <title>js 去掉字符串中的非数字</title>   
+    <style>
+      input{
+        width:100px;
+        height:100px;
+        background-color: blue;
+      }
+    </style>   
+</head>        
+<body>  
+  <input type="button" id="m-code">
+  
+  <script type="text/javascript">  
+   const list=[
+        {
+          id: "1234567890",
+          name: "Nina Ricci",
+        },
+        {
+          id: "2345678901",
+          name: "Hello Kitty",
+        },
+        {
+          id: "3456789012",
+          name: "Pusheen the cat",
+        },
+    ]
+
+    const students=[
+        {
+          id: "1234567890",
+          name: "Nina Ricci",
+        },
+        {
+          id: "2345678901",
+          name: "Hello Kitty",
+        },
+        {
+          id: "3456789012",
+          name: "Pusheen the cat",
+        },
+    ]
+
+    const teststudents=[
+        {
+          id: "1234567890",
+          name: "Nina Ricci",
+        },
+        {
+          id: "2345678901",
+          name: "Hello Kitty",
+        },
+        {
+          id: "3456789012",
+          name: "Pusheen the cat",
+        },
+    ]
+
+    const bbb=["aaa","bbb","ccc"];
+
+  
+  // console.log(students);
+  var map = students.map(student => student.name);
+  console.log(map) ;
+
+  const idList = students.map(student=>Object.keys(student));
+  console.log(idList);
+  
+  const idListt = teststudents.map(student=>Object.keys(student));
+  console.log(idListt);
+
+  const idListtva = teststudents.map(student=>Object.values(student));
+  console.log(idListtva);
+
+  // const bbblist = bbb.map(student=>Object.keys(student));
+  // console.log(bbblist);
+     
+   
+
+  
+  </script>  
+</body>        
+</html> 

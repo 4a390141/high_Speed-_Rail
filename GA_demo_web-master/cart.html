@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="style.css">
+    <script src='jquery-3.4.1.min.js'></script>
+    <title>DemoSite-Cart</title>
+</head>
+<body>
+    <!-- header -->
+    <div class="wrap">
+        <div class="header">
+            <div class="logo">
+                <a href="index.html" id="logo">
+                    <img src="index_img/logo.png" alt="">
+                </a>
+            </div>
+            <nav>
+                <a href="index.html" class="home" id='home'>
+                    Home
+                </a>
+                <a href="cart.html" class="cart" id='cart'>
+                    <img src="index_img/cart.svg" alt="">
+                    <div class="cart_count">0</div>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 表頭 -->
+    <section class="wrap">
+        <h2 class="cart-title">SHOPPING CART</h2>
+        <div class="menu-flex">
+            <div class="menu-item">
+                <div class="item-head">
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-head">Name</div>
+            </div>
+         
+            <div class="menu-item">
+                <div class="item-head">Price</div>
+            </div>
+     
+            <div class="menu-item">
+                <div class="item-head">Amount</div>
+            </div>
+     
+            <div class="menu-item">
+                <div class="item-head">Subtotal</div>
+            </div>
+        </div> 
+    </section>
+
+    <!-- 購物車內容 -->
+    <section class="wrap">
+        <div class="cart_container"></div>
+
+        <footer class="cart_footer">
+            <div class="cart_front"></div>
+            <div class="cart_front"></div>
+            <h3 class="cart_total">$Total</h3>
+            <h3 class="cart_total_price">$0</h3>
+            <a href="thank.html" class="cart_check_out_container" target="_blank">
+                <input type="button" value="Check Out" class="cart_check_out">
+            </a>
+        </footer>
+    </section>
+    
+    <script src="cart.js"></script>
+</body>
+</html>
+
+
+
+

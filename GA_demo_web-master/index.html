@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="style.css">
+    <script src='jquery-3.4.1.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <style>
+        .added {
+            box-shadow: 0px 0px 0px 4px#007799;
+            background-color: #E9F3F7;
+            color: #3E89A5;
+        }
+    </style>
+    <title>DemoSite</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- header -->
+        <div class="wrap">
+            <div class="header">
+                <div class="logo">
+                    <a href="index.html" id="logo">
+                        <img src="index_img/logo.png" alt="">
+                    </a>
+                </div>
+                <nav>
+                    <a href="index.html" class="home" id='home'>
+                        Home
+                    </a>
+                    <a href="cart.html" class="cart" id='cart' target="_blank">
+                        <div class="cart_count">{{ cart.length }}</div>
+                        <img src="index_img/cart.svg" alt="">
+                    </a>
+
+                </nav>
+            </div>
+        </div>
+
+        <!-- camp banner -->
+        <div class="wrap">
+            <a href="camp.html" class="banner" id='camp' target="_blank">
+                <h2>SUMMER SALE</h2>
+                <h3>25% OFF PLUS FREE SHIPPING</h3>
+            </a>
+        </div>
+        <!-- product part -->
+        <div class="wrap item-wrap">
+            <div class="item-flex">
+
+
+                <div class="product item" v-for="item in productList">
+                    <a :href="item.href" target="_blank">
+                        <div class="item-pic soda-pic">
+                            <img :src="item.src" alt="" class="product-image">
+                        </div>
+                        <div class="item-title">
+                            {{ item.name }}
+                        </div>
+                        <div class="price">
+                            ${{ item.price }}
+                        </div>
+                    </a>
+                    <input type="button" value="Add to cart" :class="item.class" @click="addCart(item)">
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                cart: [],
+                productList: [
+                    {
+                        id: 0,
+                        src: 'index_img/cheer.svg',
+                        href: 'product_beverage.html',
+                        name: 'Beverage',
+                        price: 1000,
+                        count: 1
+                    },
+                    {
+                        id: 1,
+                        src: 'index_img/donut.svg',
+                        href: 'product_donuts.html',
+                        name: 'Donuts',
+                        price: 1500,
+                        count: 1
+                    },
+                    {
+                        id: 2,
+                        src: 'index_img/beer.svg',
+                        href: 'product_beer.html',
+                        name: 'Beer',
+                        price: 2000,
+                        count: 1
+                    },
+                    {
+                        id: 3,
+                        src: 'index_img/chips.svg',
+                        href: 'product_chips.html',
+                        name: 'Chips',
+                        price: 2500,
+                        count: 1
+                    }
+                ]
+            },
+            mounted() {
+                const self = this
+                self.reloadCart()
+            },
+
+            methods: {
+                reloadCart() {
+                    const self = this
+
+                    if (localStorage.getItem("Cart")) {
+                        self.cart = JSON.parse(localStorage.getItem("Cart"))
+                    } else {
+                        localStorage.setItem("Cart", JSON.stringify(self.cart))
+                    }
+                    self.productList.forEach((element,index) => {
+                        let temp = self.cart.find(cart => {
+                            return element.id === cart.id
+                        })
+                        if(temp){
+                            self.$set(self.productList[index],'class','addCart added')
+                        }else{
+                            self.$set(self.productList[index],'class','addCart')
+                        }
+                    });
+
+                },
+                addCart(data) {
+                    const self = this
+
+                    let temp = self.cart.find(element => {
+                        return element.id === data.id
+                    })
+
+                    if (!temp) {
+                        self.cart.push(data)
+                        localStorage.setItem("Cart", JSON.stringify(self.cart))
+                    }
+                    
+                    self.reloadCart()
+                }
+            },
+        })
+
+
+    </script>
+
+</body>
+
+</html>
