@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <!-- css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/1.0.2/tailwind.min.css">
+    <style>
+        .ooxx{
+            background-color: aqua;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app" class="flex bg-grey-lighter flex-wrap items-center justify-center h-screen">
+        <div>
+            <div ref="boundary" class="mx-auto w-64 h-64 bg-orange-lightest rounded shadow-md p-1 relative"
+                @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp">
+                <div ref="draggable" class="cursor-move absolute bg-blue-light w-16 h-16 rounded ooxx"
+                    :style="draggablePosition" :class="{'shadow-md': isDragging, 'bg-blue-lighter': isDragging}">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+<script>
+
+    const clamp = (num, lower = 0, upper) => {
+        return num < lower ? lower : num > upper ? upper : num;
+    };
+    const app = new Vue({
+        el: '#app',
+        data: {
+            message: 'Hello World',
+            isDragging: false,
+            dragItemCoords: {
+                top: 5,
+                left: 5,
+            }
+        },
+        computed: {
+            draggablePosition() {
+                return {
+                    top: this.dragItemCoords.top + 'px',
+                    left: this.dragItemCoords.left + 'px'
+                };
+            },
+        },
+        methods: {
+            clampInsideBoundary(x, y) {
+                const boundaryPos = this.$refs.boundary.getBoundingClientRect();
+                const maxWidth = boundaryPos.width - this.$refs.draggable.clientWidth;
+                const maxHeight = boundaryPos.height - this.$refs.draggable.clientHeight;
+
+                return {
+                    x: clamp(x - boundaryPos.x, 0, maxWidth),
+                    y: clamp(y - boundaryPos.y, 0, maxHeight)
+                };
+            },
+            findPositionInsideBound(e) {
+                const x = e.clientX - (this.$refs.draggable.clientWidth / 2);
+                const y = e.clientY - (this.$refs.draggable.clientHeight / 2);
+
+                return this.clampInsideBoundary(x, y);
+            },
+            handleMouseDown(e) {
+                if (e.target === this.$refs.draggable) {
+                    this.isDragging = true;
+                }
+            },
+            handleMouseMove(e) {
+                if (this.isDragging) {
+                    const position = this.findPositionInsideBound(e);
+
+                    this.dragItemCoords = { left: position.x, top: position.y };
+                }
+            },
+            handleMouseUp() {
+                this.isDragging = false;
+            }
+        }
+    });
+
+</script>
+
+</html>

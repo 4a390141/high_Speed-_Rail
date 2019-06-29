@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <!-- bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+
+
+    <title>Document</title>
+    <style>
+        .modal-conversation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            z-index: 999999 !important;
+            width: 450px;
+            height: 492px;
+        }
+
+        .modal-body {
+            position: relative;
+            padding: 15px 30px;
+        }
+
+        .small-chat-box {
+            display: block;
+            position: unset;
+            bottom: unset;
+            right: unset;
+            width: unset;
+            height: unset;
+            border: unset;
+
+        }
+
+        .small-chat-box .content {
+            height: 100%;
+            background-color: #1ab39425;
+            padding: 15px;
+        }
+
+        #app {
+            position: relative;
+            height: 100vh;
+        }
+
+        #dashboardview {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            margin: auto;
+            width: 90%;
+            height: 90vh;
+            outline: 1px solid blueviolet;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="dashboardview">
+            <modal-conversation></modal-conversation>
+        </div>
+    </div>
+
+
+    <script>
+
+        Vue.component('modal-conversation', {
+            template: `
+                <div class="modal-conversation">
+                    <div class="modal-content">
+                        <div class="modal-header" style="max-height: 50px;" 
+                        @mousedown="mousedown"  @mousemove="handleMouseMove" @mouseup="handleMouseUp"
+                        >
+                            <button type="button" aria-hidden="true" class="close">×</button>
+                            <h4 class="modal-title">頭</h4>
+                        </div>
+                        <div class="modal-body" style="max-height: 340px;">
+                            <div class="row">
+                                <div class="small-chat-box" style="height: 300px;">
+                                    <div class="content scroller">
+                                        身體
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            methods: {
+                mousedown() {
+                    const self = this
+                    self.isDragging = true
+
+                },
+                handleMouseMove() {
+                    const self = this
+                    if (self.isDragging) {
+                        
+                    }
+                },
+                handleMouseUp() {
+                    const self = this
+                }
+            },
+            data() {
+                return {
+                    isDragging: false
+                }
+            },
+
+        })
+
+        let app = new Vue({
+            el: '#app',
+            data: {
+
+            },
+            methods: {
+
+            },
+            mounted() {
+
+            },
+        })
+    </script>
+</body>
+
+</html>
