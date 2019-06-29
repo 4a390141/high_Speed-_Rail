@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                nowId: -1,
+                mousePos: {
+                    x: 0,
+                    y: 0
+                },
+                startMousePos: {
+                    x: 0,
+                    y: 0
+                }
+            },
+            watch: {
+                mousePos() {
+                    // console.log(this.mousePos.x, this.mousePos.y)
+                    if (this.nowId != -1) {
+                        this.postits[this.nowId].pos = {
+                            x: this.mousePos.x - this.startMousePos.x,
+                            y: this.mousePos.y - this.startMousePos.y
+                        }
+                    }
+                }
+            },
+            methods: {
+                postitCss(p) {
+                    return {
+                        left: p.pos.x + 'px',
+                        top: p.pos.y + 'px',
+                        fontSize: (240 - 30) / p.text.length + 'px',
+                        backgroundColor: this.colorList[p.color]
+                    }
+                },
+                selectId(evt, id) {
+                    this.nowId = id
+                    this.startMousePos = {
+                        x: evt.offsetX,
+                        y: evt.offsetY
+                    }
+                    console.log(this.startMousePos)
+                },
+            }
+        })
+
+        window.onmousemove = (evt) => {
+            vm.mousePos = {
+                x: evt.pageX,
+                y: evt.pageY
+            }
+        }
+
+        window.onmouseup = (evt) => {
+            vm.nowId = -1
+        }
+
+    </script>
+</body>
+
+</html>

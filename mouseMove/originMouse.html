@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        Vue.component('infobase-modal-monitor', {
+            template: `
+        <div class="modal-conversation" :style="style" ref="modalConversation">
+            <div class="modal-content">
+                <div class="modal-header" style="max-height: 50px;" @mousedown.prevent="down" ref="modalHeader" @mousemove.prevent="move" @mouseup.prevent="up">
+                    <button type="button" aria-hidden="true" class="close" @click="modalClose">×</button>
+                    <h4 class="modal-title">詳細交談內容</h4>
+                </div>
+                <div class="modal-body" style="max-height: 340px;">
+                    <div class="row">
+                        <div class="small-chat-box" style="height: 300px;">
+                            <div class="content scroller">
+                                <div v-for="item in conversationRoomArry">
+                                    <div v-if="item.UserType=='agent'" style="text-align:left"> {{ item.Msg }} </div>
+                                    <div v-if="item.UserType=='client'" style="text-align:right"> {{ item.Msg }} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+  `,
+            props: {
+                source: []
+            },
+            computed: {
+                style: function () {
+                    if (this.maximized) {
+                        return {
+                            left: 0,
+                            top: 0,
+                            width: '100%',
+                            height: '100%'
+                        }
+                    }
+                    return {
+                        left: this.x + 'px',
+                        top: this.y + 'px',
+                        width: this.w + 'px',
+                        height: this.h + 'px'
+                    }
+                }
+            },
+            watch: {
+                source: {
+                    immediate: true,
+                    handler(newValue) {
+                        const self = this
+                        if (newValue) {
+                            self.conversationRoomArry = newValue
+                            console.log(newValue)
+                        }
+                    }
+                },
+                isDown: {
+                    handler(newValue) {
+                        const self = this
+                        if (newValue) {
+                            this.$refs.modalHeader.style.cursor = 'move'
+                        } else {
+                            this.$refs.modalHeader.style.cursor = 'unset'
+                        }
+                    }
+                }
+            },
+            data() {
+                return {
+                    isDown: false,
+                    offsetX: '',
+                    offsetY: '',
+                    conversationRoomArry: []
+                }
+            },
+            methods: {
+                down(event) {
+                    const self = this
+                    self.isDown = true
+
+                    let ObjLeft = self.$refs.modalConversation.offsetLeft
+                    let ObjTop = self.$refs.modalConversation.offsetTop
+                    let posX = parseInt(self.mousePosition(event).x)
+                    let posY = parseInt(self.mousePosition(event).y)
+                    self.offsetX = posX - ObjLeft
+                    self.offsetY = posY - ObjTop
+                },
+                move(event) {
+                    const self = this
+                    if (self.isDown == true) {
+
+                        let x = self.mousePosition(event).x - self.offsetX
+                        let y = self.mousePosition(event).y - self.offsetY
+                        let w = document.documentElement.clientWidth - this.$refs.modalHeader.offsetWidth
+                        let h = document.documentElement.clientHeight - this.$refs.modalHeader.offsetHeight
+
+                        // x = Math.min(w, Math.max(0, x))
+                        // y = Math.min(h, Math.max(0, y))
+                        self.$refs.modalConversation.style.left = x + 'px'
+                        self.$refs.modalConversation.style.top = y + 'px'
+                        self.$refs.modalConversation.style.margin = 'unset'
+                    }
+                },
+                up() {
+                    const self = this
+                    self.isDown = false
+
+                },
+                mousePosition(evt) {
+                    var xPos, yPos
+                    evt = evt || window.event
+                    if (evt.pageX) {
+                        xPos = evt.pageX
+                        yPos = evt.pageY
+                    }
+                    else {
+                        xPos = evt.clientX + document.body.scrollLeft - document.body.clientLeft
+                        yPos = evt.clientY + document.body.scrollTop - document.body.clientTop
+                    }
+                    return {
+                        x: xPos,
+                        y: yPos
+                    }
+                },
+                modalClose() {
+                    const self = this
+                    self.$emit('modal-close', self.conversationRoomArry[0])
+                }
+            },
+            mounted() {
+                const self = this
+                window.document.addEventListener('mouseup', self.up)
+            }
+        })
+
+    </script>
+</body>
+
+</html>
