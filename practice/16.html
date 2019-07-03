@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea class="smallArea" cols="60" name="txta" rows="8" id="ooo" oninput="myFunction(this)"></textarea>
+    <button id="aaa">aaaa</button>
+    <div id="xxx"></div>
+    <script>
+        let ooo = document.getElementById('ooo')
+        let xxx = document.getElementById('xxx')
+        let aaa = document.getElementById('aaa')
+        // ooo.onpropertychange=function(){
+        //     if(this.value.length>100) this.value=this.value.substr(0,100)
+        // }
+        function myFunction(eee){
+            if (eee.value.length > 100) { eee.value = eee.value.substr(0, 100) }
+        }
+        // ooo.addEventListener('input ', () => {
+        //     if (this.value.length > 100) { this.value = this.value.substr(0, 100) }
+        // })
+        aaa.addEventListener('click', () => {
+            // if(ooo.value.length>100) ooo.value=ooo.value.substr(0,100)
+            xxx.innerHTML = ooo.value.length
+        })
+    </script>
+</body>
+
+</html>
