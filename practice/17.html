@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+
+        let param = {
+            tenantID: 3,
+            entityTypeID: self.entityTypeID,
+            statusID: 2,
+            reasonID: 0,
+            agentID: sessionStore.read('UserID_g'),
+        }
+        APIManager.insert('AgentStatus').by(param)
+
+
+        if (!self.isLogout) {
+            // temp.loginOrLogout.isLoading = true;
+            // temp.isLoading = true;
+
+        }
+
+        // 寫回session
+        sessionStore.write('personMappingByDBID_g', JSON.stringify(personMappingByDBID))
+
+        agentListData.agentlist.forEach(function (item, index, array) {
+            if (personMappingByDBID[item.userid] == null) {
+                personMappingByDBID[item.userid] = ((!!item.dialno ? item.dialno : '-') + '(' + item.username + ')')
+            }
+        })
+
+        agentListData.agentlist.forEach(function (item, index, array) {
+            let tempTr = ''
+            if (item.userid == sessionStore.read('UserID_g')) return;
+            if (webChatInRoomUser.indexOf(item.statid) !== -1) return;
+            if (personMappingByDBID[item.userid] == null) {
+                personMappingByDBID[item.userid] = ((!!item.dialno ? item.dialno : '-') + '(' + item.username + ')')
+                console.log(item)
+                tempTr = `<tr>
+                                <input type="hidden" name="statID" value="` + item.statid + `" >
+                                <td>` + (!!item.dialno ? item.dialno : '-') + '(' + item.username + ')' + `</td>
+                                <td><button onclick="multiPersonTalk(this,'invite')" class="btn btn-outline btn-primary m-r-xs">` + (t('AgentWorkSpace.threeWays')) + `</button>
+                                <button onclick="multiPersonTalk(this,'transfer')" class="btn btn-outline btn-primary">` + t('AgentWorkSpace.transfer') + `</button></td>
+                          </tr>`;
+            } else {
+                console.log(item)
+                tempTr = `<tr>
+                                <input type="hidden" name="statID" value="` + item.statid + `" >
+                                <td>` + personMappingByDBID[item.userid] + `</td>
+                                <td><button onclick="multiPersonTalk(this,'invite')" class="btn btn-outline btn-primary m-r-xs">` + (t('AgentWorkSpace.threeWays')) + `</button>
+                                <button onclick="multiPersonTalk(this,'transfer')" class="btn btn-outline btn-primary">` + t('AgentWorkSpace.transfer') + `</button></td>
+                          </tr>`;
+            }
+            tbody.append(tempTr);
+        });
+    </script>
+</body>
+
+</html>

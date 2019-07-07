@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- howler.js v2.0.8 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.8/howler.min.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <em id="state"></em>
+    <hr />
+    <button onclick="javascript:play();">播放</button>
+    <button onclick="javascript:stop();">停止</button>
+    <button onclick="javascript:pause();">暫停</button>
+    <script>
+        var sound = new Howl({
+            // 參數設定[註1]
+            src: ["https://www.var.tw/it2018/day39.mp3"],
+            autoplay: false, // 自動播放
+            loop: false, // 無限循環
+            volume: 0.5, // 音量ntById( "state" ).innerText = "結束";
+            onload: function () {
+                // 載入後執行
+                document.getElementById("state").innerText = "載入完成";
+            },
+            onplay: function () {
+                // 播放後執行
+                document.getElementById("state").innerText = "播放中";
+            },
+            onpause: function () {
+                // 暫停後執行
+                document.getElementById("state").innerText = "暫停";
+            },
+            onstop: function () {
+                // 停止後執行
+                document.getElementById("state").innerText = "停止";
+            },
+            onend: function () {
+                // 結束後執行
+                document.getElementById("state").innerText = "結束";
+            }
+        });
+
+        function play() {
+            sound.play(); // 播放
+        }
+        function stop() {
+            sound.stop(); // 停止
+        }
+        function pause() {
+            sound.pause(); // 暫停
+        }
+    </script>
+</body>
+
+</html>
