@@ -9,13 +9,14 @@
 </head>
 
 <body>
-    <div class="left">
-        <div class="author-name">
-            <span class="chat-name">2019/06/28 訪客</span> 
-            <small class="chat-date">13:43</small>
-        </div>
-        <div class="chat-message">ee</div>
-    </div>
+
+
+    <data-table :columns="columns" :fixed-header="true" :table-order="[[6, 'asc']]" class="col-sm-12"
+        style="height: 56vh;" :source="source" @reload-data="reloadSource" :pagination="true"
+        :display-length="displayLength" :records-total.sync="recordsTotal" :extra-param="extraParam"
+        @created-row="createdRow" dom="l<'displayNone'B>rtip" @tr-click="clickRow">
+    </data-table>
+
 </body>
 
 </html>
