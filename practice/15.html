@@ -17,6 +17,52 @@
         @created-row="createdRow" dom="l<'displayNone'B>rtip" @tr-click="clickRow">
     </data-table>
 
+    <script>
+        let FormData = getFormData($('#searchForm'))
+
+        if (FormData.personNullFlag == 'Y') {
+            $('#actionType').val('assign')
+        } else if (FormData.personNullFlag == 'N') {
+            $('#actionType').val('change')
+        } else if (FormData.personNullFlag == 'D') {
+            $('#actionType').val('delete')
+        }
+
+        // let param = {
+        //   tenantID: sessionStore.read('tenantID_g'),
+        //   TMCaseID: FormData.TMCaseID,
+        //   page: 0,
+        //   size: 10,
+        //   nameListID: FormData.NameListID,
+        //   isAssignment:N,
+        //   entityTypeID: 10,
+        //   text:111111,
+        //   completeTimeStart: ListAssignDateModalVue.startTime,
+        //   completeTimeEnd: ListAssignDateModalVue.edTime,
+        //   isComplete:N
+        // }
+
+        let otherSearchCol = []
+        let $customizationForm = $('#customizationForm')
+        let rows = $customizationForm.find('.row')
+        rows.each(function (index, item) {
+            let $item = $(item)
+            let selectCustomization = $item.find('[name="selectCustomization"]').val()
+            let selectAction = $item.find('[name="selectAction"]').val()
+            let inputCustomization = $item.find('[name="inputCustomization"]').val()
+            if (inputCustomization.length > 0 && selectCustomization.length > 0) {
+                let param = {
+                    searchColName: selectCustomization.toString(),
+                    searchValue: selectAction.toString(),
+                    operator: inputCustomization.toString()
+                }
+                otherSearchCol.push(param)
+            }
+        })
+        TMCoreDataparams.otherSearchCol = otherSearchCol
+
+    </script>
+
 </body>
 
 </html>
