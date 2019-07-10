@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- 泰坦tick存入 InsertNote -->
+    <!--             目前泰坦專用                 -->
+    <span class="float-right"
+        v-if="sessionStore.read('customizedObj') === 'titansoft'">{{sessionStore.read('customizedObj')}}<i
+            class="fas fa-plus"></i></span>
+
+    <infobase-modal :is-active="StructuredTextModal.active">
+        <template slot="header">
+            <button type="button" class="close" aria-hidden="true" @click="StructuredTextModal.active= false">×</button>
+            <h4 class="modal-title">{{t('c_info360_ixnContent.modal_detail_title')}}</h4>
+        </template>
+        <div slot="body" class="row">
+            <div class="small-chat-box" style="height: 300px;">
+                <div class="content scroller" v-html="conversationContent">
+                </div>
+            </div>
+        </div>
+        <template slot="body_btn">
+            <infobase-button class="btn-default" icon="fas fa-times" :icon-with-i="true"
+                @click="StructuredTextModal.active= false" :btnword="(t('c_info360_ixnContent.modal_detail_btnClose'))">
+            </infobase-button>
+        </template>
+    </infobase-modal>
+
+    <div class="modal-footer">
+        <button data-dismiss="modal" class="btn btn-outline btn-primary">
+            <i class="fas fa-check"></i>
+            <span>儲存</span>
+        </button>
+        <button data-dismiss="modal" class="btn btn-outline btn-default">
+            <i class="fas fa-times"></i>
+            <span>取消</span>
+        </button>
+    </div>
+    <div class="row">
+        <form>
+            <div class="form-group col-sm-12"><label class="col-sm-2 control-label labelcenter">名稱</label>
+                <div class="col-sm-10"><input type="text" placeholder="請輸入名稱" class="form-control"></div>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="form-group col-sm-3">
+        <label class="col-sm-4 control-label labelcenter">客戶資料</label>
+        <div class="col-sm-8"></div>
+    </div>
+    <script>
+
+        // title層
+        self.SatisfactionTitleArray = data.SatisfactionData[0].tblCfgSatisfactionTitle
+
+    </script>
+    <!-- star key = SatisfactionItemName value = SatisfactionItemID -->
+</body>
+
+</html>
