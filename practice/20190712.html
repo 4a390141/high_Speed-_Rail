@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <data-table-client-side v-if="insureType === '1'" :is-editable="false" dom="il<'displayNone'Bp>rt"
+        :fixed-header="true" :pagination="false" :table-order="[]" fixed-header-height="calc(100vh - 310px)"
+        :table-language="tableLanguage" class="webFormTable" :columns="fireHeaders" :source="fireWeeks"
+        :display-length="fireWeeks.length">
+    </data-table-client-side>
+
+    <script>
+Vue.component('infobase-inputtext', {
+  props: {
+    label: String,
+    labelCol: Number,
+    colMaxLength: { type: Number, default: 12 },
+    value: String,
+    maxlength: { type: String, default: '' },
+    placeholder: { type: String, default: '' },
+    required: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false }
+  },
+  computed: {
+    labelClass: function() {
+      let length = this.labelCol
+      return 'col-sm-' + length
+    },
+    inputClass: function() {
+      let length = this.colMaxLength - this.labelCol
+      return 'col-sm-' + length
+    }
+  },
+  template: `
+    <div class="form-group">
+        <label class="control-label labelcenter" :class="labelClass">
+            <span v-if="required" class="text-danger">*</span>
+            {{label}}
+        </label>
+        <slot name="mid"></slot>
+        <div :class="inputClass">
+            <input class="form-control" type="text" :maxlength="maxlength" :placeholder="placeholder" :disabled="disabled"
+                 :value="value" @input="$emit('update:value', $event.target.value)">
+        </div>
+        <slot></slot>
+    </div>
+    `
+})
+    </script>
+</body>
+
+</html>

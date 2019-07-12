@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        JSON.parse(sessionStore.read('personMappingByDBID_g'))[data]
+    </script>
+
+    <infobase-datetimepicker-group class="form-group col-sm-6" format="YYYY-MM-DD"
+        :label="t('TMAgentSearch.ReservationAccessTime')" :label-col="3" :start-value.sync="formData.startDate"
+        :end-value.sync="formData.endDate">
+    </infobase-datetimepicker-group>
+
+    <!-- , : 30個字-->
+</body>
+
+</html>
