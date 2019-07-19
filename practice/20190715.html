@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+
+        self.instance.onmessage = function (event) {
+            let eventObj = event.data
+            if ('HeartBeatCheckPoint' !== eventObj) {
+                self.number++
+                let data = JSON.parse(eventObj)
+                if (data.Event) {
+                    data.Event = data.Event.toLowerCase()
+                }
+                self.dispatchEvent(data.Event, data)
+                self.pushData(data)
+            } else {
+                self.onheartbeat(event, this.number)
+            }
+        }
+
+
+        self.instance.onmessage = function(event) {
+      let eventObj = event.data
+      if ('HeartBeatCheckPoint' !== eventObj) {
+        self.number++
+        let data = JSON.parse(eventObj)
+        if (data.Event) {
+          data.Event = data.Event.toLowerCase()
+        }
+        self.dispatchEvent(data.Event, data)
+      } else {
+        self.onheartbeat(event, this.number)
+      }
+    }
+    </script>
+</body>
+
+</html>

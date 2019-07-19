@@ -16,28 +16,28 @@
     </data-table-client-side>
 
     <script>
-Vue.component('infobase-inputtext', {
-  props: {
-    label: String,
-    labelCol: Number,
-    colMaxLength: { type: Number, default: 12 },
-    value: String,
-    maxlength: { type: String, default: '' },
-    placeholder: { type: String, default: '' },
-    required: { type: Boolean, default: false },
-    disabled: { type: Boolean, default: false }
-  },
-  computed: {
-    labelClass: function() {
-      let length = this.labelCol
-      return 'col-sm-' + length
-    },
-    inputClass: function() {
-      let length = this.colMaxLength - this.labelCol
-      return 'col-sm-' + length
-    }
-  },
-  template: `
+        Vue.component('infobase-inputtext', {
+            props: {
+                label: String,
+                labelCol: Number,
+                colMaxLength: { type: Number, default: 12 },
+                value: String,
+                maxlength: { type: String, default: '' },
+                placeholder: { type: String, default: '' },
+                required: { type: Boolean, default: false },
+                disabled: { type: Boolean, default: false }
+            },
+            computed: {
+                labelClass: function () {
+                    let length = this.labelCol
+                    return 'col-sm-' + length
+                },
+                inputClass: function () {
+                    let length = this.colMaxLength - this.labelCol
+                    return 'col-sm-' + length
+                }
+            },
+            template: `
     <div class="form-group">
         <label class="control-label labelcenter" :class="labelClass">
             <span v-if="required" class="text-danger">*</span>
@@ -52,6 +52,7 @@ Vue.component('infobase-inputtext', {
     </div>
     `
 })
+subitems
     </script>
 </body>
 
