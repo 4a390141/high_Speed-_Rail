@@ -1,0 +1,689 @@
+@charset "UTF-8";
+/* line 6, ../sass/frame/__reset.scss */
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+}
+
+/* line 26, ../sass/frame/__reset.scss */
+body {
+  line-height: 1;
+}
+
+/* line 30, ../sass/frame/__reset.scss */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+/* line 34, ../sass/frame/__reset.scss */
+ul, ol {
+  list-style: none;
+}
+
+/* line 37, ../sass/frame/__reset.scss */
+blockquote, q {
+  quotes: none;
+}
+
+/* line 40, ../sass/frame/__reset.scss */
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+/* line 45, ../sass/frame/__reset.scss */
+a {
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+  text-decoration: none;
+}
+
+/* line 54, ../sass/frame/__reset.scss */
+ins {
+  background-color: #ff9;
+  color: #000;
+  text-decoration: none;
+}
+
+/* line 60, ../sass/frame/__reset.scss */
+mark {
+  background-color: #ff9;
+  color: #000;
+  font-style: italic;
+  font-weight: bold;
+}
+
+/* line 66, ../sass/frame/__reset.scss */
+del {
+  text-decoration: line-through;
+}
+
+/* line 69, ../sass/frame/__reset.scss */
+abbr[title], dfn[title] {
+  border-bottom: 1px dotted;
+  cursor: help;
+}
+
+/* line 73, ../sass/frame/__reset.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 78, ../sass/frame/__reset.scss */
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #cccccc;
+  margin: 1em 0;
+  padding: 0;
+}
+
+/* line 86, ../sass/frame/__reset.scss */
+input, select {
+  vertical-align: middle;
+}
+
+/* line 89, ../sass/frame/__reset.scss */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Helvetica';
+  src: url(../libs/Helvetica.otf);
+}
+/* line 5, ../sass/frame/_layouts.scss */
+html, body {
+  height: 100%;
+  font-family: Helvetica, Arial,"微軟正黑體","新細明體";
+  color: #2c3b47;
+  font-size: 1rem;
+  line-height: 140%;
+}
+
+/* line 12, ../sass/frame/_layouts.scss */
+body {
+  width: 100%;
+}
+
+/* line 15, ../sass/frame/_layouts.scss */
+* {
+  outline: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* line 20, ../sass/frame/_layouts.scss */
+a {
+  text-decoration: none;
+  color: #000;
+}
+
+/* line 24, ../sass/frame/_layouts.scss */
+.crop {
+  position: relative;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+  padding-top: 100%;
+}
+/* line 209, ../sass/define/___mixins.scss */
+.crop img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+/* line 26, ../sass/frame/_layouts.scss */
+.crop a {
+  display: block;
+}
+
+/* line 30, ../sass/frame/_layouts.scss */
+.inline {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* line 34, ../sass/frame/_layouts.scss */
+.hide {
+  display: none !important;
+}
+
+/* line 18, ../sass/define/___mixins.scss */
+.container, .clearfix {
+  zoom: 1;
+}
+/* line 21, ../sass/define/___mixins.scss */
+.container:after, .clearfix:after {
+  content: ".";
+  display: block;
+  clear: both;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+/* line 40, ../sass/frame/_layouts.scss */
+.container {
+  position: relative;
+  margin: 0 auto;
+  width: 1920px;
+}
+
+@media screen and (max-width: 767px) {
+  /* line 48, ../sass/frame/_layouts.scss */
+  .hidden-mobile {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+  /* line 53, ../sass/frame/_layouts.scss */
+  .hidden-pad {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  /* line 58, ../sass/frame/_layouts.scss */
+  .hidden-desktop {
+    display: none;
+  }
+}
+
+/* line 63, ../sass/frame/_layouts.scss */
+.col-left {
+  float: left;
+}
+
+/* line 66, ../sass/frame/_layouts.scss */
+.col-right {
+  float: right;
+}
+
+/* line 69, ../sass/frame/_layouts.scss */
+.text-center {
+  text-align: center;
+}
+
+/* line 72, ../sass/frame/_layouts.scss */
+.text-right {
+  text-align: right;
+}
+
+/* line 75, ../sass/frame/_layouts.scss */
+.text-left {
+  text-align: left;
+}
+
+/* line 78, ../sass/frame/_layouts.scss */
+.blue {
+  color: #1376e0 !important;
+}
+
+/* line 81, ../sass/frame/_layouts.scss */
+.red {
+  color: #d7393e !important;
+}
+
+/* line 84, ../sass/frame/_layouts.scss */
+.d-orange {
+  color: #f94f0c !important;
+}
+
+/* line 87, ../sass/frame/_layouts.scss */
+.bold {
+  font-weight: bold;
+}
+
+/* line 90, ../sass/frame/_layouts.scss */
+.text-hide {
+  text-indent: -9999px;
+}
+
+/* line 93, ../sass/frame/_layouts.scss */
+.font-12 {
+  font-size: 0.75rem;
+}
+
+/* line 96, ../sass/frame/_layouts.scss */
+.font-13 {
+  font-size: 0.813rem;
+}
+
+/* line 99, ../sass/frame/_layouts.scss */
+.font-14 {
+  font-size: 0.875rem;
+}
+
+/* line 102, ../sass/frame/_layouts.scss */
+.font-15 {
+  font-size: 0.9375rem;
+}
+
+/* line 105, ../sass/frame/_layouts.scss */
+.font-16 {
+  font-size: 1rem;
+}
+
+/* line 108, ../sass/frame/_layouts.scss */
+.font-17 {
+  font-size: 1.063rem;
+}
+
+/* line 111, ../sass/frame/_layouts.scss */
+.font-18 {
+  font-size: 1.125rem;
+}
+
+/* line 114, ../sass/frame/_layouts.scss */
+.font-20 {
+  font-size: 1.25rem;
+}
+
+/* line 117, ../sass/frame/_layouts.scss */
+.font-22 {
+  font-size: 1.375rem;
+}
+
+/* line 120, ../sass/frame/_layouts.scss */
+.font-24 {
+  font-size: 1.5rem;
+}
+
+/* line 123, ../sass/frame/_layouts.scss */
+.font-26 {
+  font-size: 1.625rem;
+}
+
+/* line 126, ../sass/frame/_layouts.scss */
+.font-28 {
+  font-size: 1.75rem;
+}
+
+/* line 129, ../sass/frame/_layouts.scss */
+.font-30 {
+  font-size: 1.875rem;
+}
+
+/* line 132, ../sass/frame/_layouts.scss */
+.font-34 {
+  font-size: 2.125rem !important;
+}
+
+/* line 135, ../sass/frame/_layouts.scss */
+.font-36 {
+  font-size: 2.25rem;
+}
+
+/* line 138, ../sass/frame/_layouts.scss */
+.font-48 {
+  font-size: 3rem;
+}
+
+/* line 141, ../sass/frame/_layouts.scss */
+.font-60 {
+  font-size: 3.75rem;
+}
+
+/* line 144, ../sass/frame/_layouts.scss */
+.br {
+  display: block;
+}
+
+/* line 147, ../sass/frame/_layouts.scss */
+.d-show {
+  display: none;
+}
+
+/* line 151, ../sass/frame/_layouts.scss */
+.flex {
+  display: flex;
+}
+
+/* line 154, ../sass/frame/_layouts.scss */
+.flex-align-center {
+  align-items: center;
+}
+
+/* line 157, ../sass/frame/_layouts.scss */
+.space-between {
+  justify-content: space-between;
+}
+
+/* line 160, ../sass/frame/_layouts.scss */
+.d-table {
+  display: table;
+}
+/* line 162, ../sass/frame/_layouts.scss */
+.d-table .v-middle {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+/* line 168, ../sass/frame/_layouts.scss */
+.w-10p {
+  width: 10%;
+}
+
+/* line 171, ../sass/frame/_layouts.scss */
+.w-40p {
+  width: 40%;
+}
+
+/* line 174, ../sass/frame/_layouts.scss */
+.w-60p {
+  width: 60%;
+}
+
+/* line 177, ../sass/frame/_layouts.scss */
+.w-90p {
+  width: 90%;
+}
+
+/* line 180, ../sass/frame/_layouts.scss */
+.ml-10 {
+  margin-left: 10px;
+}
+
+/* line 183, ../sass/frame/_layouts.scss */
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+/* line 186, ../sass/frame/_layouts.scss */
+.mb-23 {
+  margin-bottom: 23px;
+}
+
+/* line 189, ../sass/frame/_layouts.scss */
+.mb-25 {
+  margin-bottom: 25px;
+}
+
+/* line 192, ../sass/frame/_layouts.scss */
+.font-blue {
+  color: #1376e0;
+}
+
+/* line 195, ../sass/frame/_layouts.scss */
+.font-red {
+  color: #d7393e;
+}
+
+/* line 200, ../sass/frame/_layouts.scss */
+.inlineBlock.v-top > * {
+  vertical-align: top;
+}
+/* line 204, ../sass/frame/_layouts.scss */
+.inlineBlock > * {
+  display: inline-block;
+  margin-left: -4px;
+}
+
+@media only screen and (min-width: 1024px) {
+  /* line 210, ../sass/frame/_layouts.scss */
+  .d-br {
+    display: block;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+  /* line 215, ../sass/frame/_layouts.scss */
+  .p-br {
+    display: block;
+  }
+}
+@media only screen and (max-width: 640px) {
+  /* line 220, ../sass/frame/_layouts.scss */
+  .m-br {
+    display: block;
+  }
+}
+@media (max-width: 480px) {
+  /* line 225, ../sass/frame/_layouts.scss */
+  .xs-br {
+    display: block;
+  }
+}
+/* line 39, ../sass/define/___background.scss */
+.icon-time {
+  position: relative;
+}
+/* line 42, ../sass/define/___background.scss */
+.icon-time:before {
+  content: ".";
+  height: 0;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  background-image: url(../img/icon.png);
+  background-repeat: no-repeat;
+  overflow: hidden;
+  position: absolute;
+}
+@media only screen and (-moz-min-device-pixel-ratio: 2), only screen and (max--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+  /* line 60, ../sass/define/___background.scss */
+  .icon-time:before {
+    background-image: url(../img/icon_retina.png);
+    background-size: 750px 750px;
+  }
+}
+/* line 23, ../sass/define/___background.scss */
+.icon-time:before {
+  width: 52px;
+  padding-top: 45px;
+  background-position: 0px 0px;
+  top: 0px;
+  left: 0px;
+}
+
+/* line 39, ../sass/define/___background.scss */
+.icon-message {
+  position: relative;
+}
+/* line 42, ../sass/define/___background.scss */
+.icon-message:before {
+  content: ".";
+  height: 0;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  background-image: url(../img/icon.png);
+  background-repeat: no-repeat;
+  overflow: hidden;
+  position: absolute;
+}
+@media only screen and (-moz-min-device-pixel-ratio: 2), only screen and (max--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+  /* line 60, ../sass/define/___background.scss */
+  .icon-message:before {
+    background-image: url(../img/icon_retina.png);
+    background-size: 750px 750px;
+  }
+}
+/* line 23, ../sass/define/___background.scss */
+.icon-message:before {
+  width: 44px;
+  padding-top: 48px;
+  background-position: -3px -51px;
+  top: 0px;
+  left: 0px;
+}
+
+/* line 39, ../sass/define/___background.scss */
+.icon-marquee {
+  position: relative;
+}
+/* line 42, ../sass/define/___background.scss */
+.icon-marquee:before {
+  content: ".";
+  height: 0;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  background-image: url(../img/icon.png);
+  background-repeat: no-repeat;
+  overflow: hidden;
+  position: absolute;
+}
+@media only screen and (-moz-min-device-pixel-ratio: 2), only screen and (max--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+  /* line 60, ../sass/define/___background.scss */
+  .icon-marquee:before {
+    background-image: url(../img/icon_retina.png);
+    background-size: 750px 750px;
+  }
+}
+/* line 23, ../sass/define/___background.scss */
+.icon-marquee:before {
+  width: 36px;
+  padding-top: 40px;
+  background-position: 0px -105px;
+  top: 0px;
+  left: 0px;
+}
+
+/* line 13, ../sass/frame/_icon.scss */
+[class^="icon-"]:before,
+[class*="icon-"]:before {
+  content: "";
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  zoom: 1;
+}
+
+/* line 2, ../sass/frame/_footer.scss */
+.footer {
+  background-color: #017f7f;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#02aeaf), to(#009899));
+  background-image: -webkit-linear-gradient(top, #02aeaf, #009899);
+  background-image: -moz-linear-gradient(top, #02aeaf, #009899);
+  background-image: -ms-linear-gradient(top, #02aeaf, #009899);
+  background-image: -o-linear-gradient(top, #02aeaf, #009899);
+  background-image: linear-gradient(top bottom, #02aeaf, #009899);
+  color: #ffffff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+}
+/* line 18, ../sass/define/___mixins.scss */
+.footer {
+  zoom: 1;
+}
+/* line 21, ../sass/define/___mixins.scss */
+.footer:after {
+  content: ".";
+  display: block;
+  clear: both;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+/* line 10, ../sass/frame/_footer.scss */
+.footer.red {
+  background-color: #7f5a5d;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#e35d60), to(#cc575a));
+  background-image: -webkit-linear-gradient(top, #e35d60, #cc575a);
+  background-image: -moz-linear-gradient(top, #e35d60, #cc575a);
+  background-image: -ms-linear-gradient(top, #e35d60, #cc575a);
+  background-image: -o-linear-gradient(top, #e35d60, #cc575a);
+  background-image: linear-gradient(top bottom, #e35d60, #cc575a);
+}
+/* line 12, ../sass/frame/_footer.scss */
+.footer.red .marquee {
+  background: #b9393c;
+  color: #ffffff;
+}
+/* line 16, ../sass/frame/_footer.scss */
+.footer.red .col-right {
+  background: #db7577;
+  color: #ffffff;
+}
+/* line 19, ../sass/frame/_footer.scss */
+.footer.red .col-right:before {
+  border-color: transparent transparent #db7577 transparent;
+}
+/* line 24, ../sass/frame/_footer.scss */
+.footer .col-left {
+  padding: 20px 45px;
+  width: 79%;
+}
+@media (max-width: 1400px) {
+  /* line 24, ../sass/frame/_footer.scss */
+  .footer .col-left {
+    width: 70%;
+  }
+}
+/* line 31, ../sass/frame/_footer.scss */
+.footer .col-right {
+  background: #2cbcbc;
+  width: 17%;
+  height: 100vh;
+  font-size: 1.75rem;
+  line-height: 130%;
+  font-weight: bold;
+  position: relative;
+  padding-top: 15px;
+  padding-left: 35px;
+}
+@media (max-width: 1400px) {
+  /* line 31, ../sass/frame/_footer.scss */
+  .footer .col-right {
+    width: 23%;
+  }
+}
+/* line 44, ../sass/frame/_footer.scss */
+.footer .col-right:before {
+  content: " ";
+  display: block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 100px 100px;
+  border-color: transparent transparent #2cbcbc transparent;
+  position: absolute;
+  top: 0;
+  left: -99px;
+}
+/* line 57, ../sass/frame/_footer.scss */
+.footer .marquee {
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  background: #008586;
+  padding: 10px 30px;
+}
+/* line 63, ../sass/frame/_footer.scss */
+.footer .marquee marquee {
+  line-height: 140%;
+  font-size: 1.875rem;
+}
