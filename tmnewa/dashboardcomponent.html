@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <!-- css -->
+    <link rel="stylesheet" href="css/frame.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/vendors/swiper.css">
+
+    <!-- echarts -->
+    <script type="text/javascript" src="js/echarts.min.js"></script>
+    <!-- swiper -->
+    <script type="text/javascript" src="js/swiper.min.js"></script>
+    <!-- jQuery -->
+    <script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <!-- vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.7.0/qs.min.js"></script>
+
+    <title>dashBoard</title>
+    <script>
+        axios.defaults.headers = {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    </script>
+</head>
+
+<body>
+    <app id="tmnewaDashboard">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <tmnewa-dash-board :entity-type-i-d="'2'"></tmnewa-dash-board>
+                <tmnewa-dash-board :entity-type-i-d="'1'"></tmnewa-dash-board>
+            </div>
+        </div>
+    </app>
+
+
+
+
+
+
+</body>
+
+<!-- <script type="text/javascript" src="js/bar.js"></script> -->
+
+<script>
+
+    Vue.component('tmnewa-dash-board', {
+        template: `
+        <div class="swiper-slide">
+        <div class="chat">
+            <article class="article">
+                <div class="col-left">
+                    <section class="block green mb-25">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="default">
+                            <tr>
+                                <th class="title" width="10%">
+                                    <h2>
+                                        <i class="icon-time"></i>
+                                        時<br>段<br>服<br>務<br>水<br>準
+                                    </h2>
+                                </th>
+                                <td class="con" width="90%">
+                                    <div class="clearfix">
+                                        <div class="rate text-center">
+                                            <div class="d-table">
+                                                <div class="v-middle">
+                                                    <p class="text">接聽率</p>
+                                                    <p class="num font-blue">{{ timeServicePresent }}<span>%</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="main" ref='main'></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </section>
+                    <section class="block yellow mb-23 message">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="default border">
+                            <tr>
+                                <th rowspan="2" class="title" width="10%">
+                                    <h2>
+                                        <i class="icon-message"></i>
+                                        各<br>狀<br>態<br>即<br>時<br>通<br>時
+                                    </h2>
+                                </th>
+                                <td colspan="2" width="45%" class="bt-0">
+                                    <p class="text">等待人數</p>
+                                    <p class="num font-red">{{ waitingCount }}</p>
+                                </td>
+                                <td colspan="2" width="45%" class="bt-0">
+                                    <p class="text">等待時間</p>
+                                    <p class="num font-red">{{ waitingTime }}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="22.5%">
+                                    <p class="text">登入</p>
+                                    <p class="num2">{{ LoginCount }}</p>
+                                </td>
+                                <td width="22.5%">
+                                    <p class="text">就緒</p>
+                                    <p class="num2">{{ ReadyCount }}</p>
+                                </td>
+                                <td width="22.5%">
+                                    <p class="text">離席</p>
+                                    <p class="num2">{{ LoginOutCount }}</p>
+                                </td>
+                                <td width="22.5%">
+                                    <p class="text">平均處理時間</p>
+                                    <p class="num2">{{ AvgprocessingTime }}</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </section>
+                </div>
+                <div class="col-right">
+                    <section class="block green-w member">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="default">
+                            <tr class="title">
+                                <th>服務人員</th>
+                                <th>狀態</th>
+                                <th>持續時間</th>
+                                <th>值勤</th>
+                            </tr>
+                            <tr v-for="item in agentArray">
+                                <td class="bold">{{ item['agentName'] }}</td>
+                                <td class="bold online-b"><span class="circle"></span>{{ item['agentStatus'] }}</td>
+                                <td>{{ changeTimeToHMS((parseInt(item['agentStatusDurationTime'],10)/1000)) }}</td>
+                                <td>00:00:00</td>
+                            </tr>
+                        </table>
+                    </section>
+                </div>
+            </article>
+            <footer class="footer">
+                <div class="col-left">
+                    <div class="marquee">
+                        <i class="icon-marquee"></i>
+                        <marquee direction="left" scrollamount="5">不必在現場大喊，一鍵就能送出通知，自動發送簡訊或Email提醒即將可入座的顧客不必在現場
+                        </marquee>
+                    </div>
+                </div>
+                <div class="col-right">
+                    <p>2019年06月01日</p>
+                    <p>星期六 11:59:59</p>
+                </div>
+            </footer>
+        </div>
+
+    </div>
+        `,
+        props: {
+            entityTypeID: {}
+        },
+        data() {
+            return {
+                today: new Date(),
+                timeServiceData: [],
+                timeServicePresent: 0,
+                ReadyCount: 0,
+                LoginOutCount: 0,
+                AvgprocessingTime: 0,
+                waitingCount: 0,
+                waitingTime: 0,
+                agentArray: [],
+                AgentReasonMappingObject: {
+                    'LogOut': '未就緒',
+                    'LogInt': '就緒'
+                }
+            }
+        },
+        computed: {
+            LoginCount() {
+                const self = this
+                return parseInt(self.ReadyCount, 10) + parseInt(self.LoginOutCount, 10)
+            }
+        },
+        mounted() {
+            const self = this
+            self.reloadsource()
+            let system1000mTimer = new Worker('js/interval.js')
+            system1000mTimer.onmessage = async function (event) {
+                if (event.data === 'time.tick') {
+                    self.reloadsource()
+                }
+            }
+            // 30秒更新一次
+            system1000mTimer.postMessage({ start: true, ms: 5000 })
+        },
+        methods: {
+            async reloadsource() {
+                const self = this
+                // api 回傳資料
+                let repoTimeService = await self.getTimeService()
+                if (repoTimeService) {
+                    let timeInterval = ['08~09', '09~10', '10~11', '11~12', '13~14', '14~15', '15~16', '16~17', '17~18']
+                    let data = []
+                    // 複製的回傳資料
+                    let tempRepoTimeService = JSON.parse(JSON.stringify(repoTimeService))
+                    // 將filter時間是8點到16點的
+                    self.timeServiceData = self.realTimeToWork(tempRepoTimeService.ServicesReport)
+                    // 將每個區間百分比放入data中
+                    self.timeServiceData.forEach(element => {
+                        data.push(element.FinishPercentage)
+                    })
+                    self.timeServicePresent = Math.round((parseInt(repoTimeService.FinishCallsCount, 10) / parseInt(repoTimeService.CallCount, 10) * 100))
+                    self.AvgprocessingTime = repoTimeService.AvgprocessingTime
+                    console.table(repoTimeService)
+                    self.Echarts(self.$refs.main, timeInterval, data)
+
+                }
+                let repoTimelyStatus = await self.getTimelyStatus()
+                if (repoTimelyStatus) {
+                    let tempRepoTimelyStatus = JSON.parse(JSON.stringify(repoTimelyStatus))
+                    self.ReadyCount = tempRepoTimelyStatus.ServicesCalls[0].ReadyCount
+                    self.LoginOutCount = tempRepoTimelyStatus.ServicesCalls[0].LoginOutCount
+                }
+                // 等待人數 等待時間
+                let repoWaitCount = await self.getWaitCount()
+                console.log(repoWaitCount)
+                if (repoWaitCount) {
+                    let tempWaitingTimeArray = []
+                    self.waitingCount = 0
+                    self.waitingTime = 0
+                    repoWaitCount.forEach(element => {
+                        self.waitingCount += parseInt(element.clientWaittingCount, 10)
+                        tempWaitingTimeArray.push(parseInt(element.clientWaittingAvgTime, 10))
+                    })
+
+                    self.waitingTime = self.changeTimeToMS(Math.max(...tempWaitingTimeArray))
+                }
+                // 人員列表
+                let repoAgentReasonByFlag = await self.getAgentReasonByFlag()
+                console.log(repoAgentReasonByFlag)
+                repoAgentReasonByFlag.forEach(element => {
+                    self.AgentReasonMappingObject[element.DBID] = element.StatusName
+                })
+
+                let repoPersonnelStatus = await self.getPersonnelStatus()
+                if (repoPersonnelStatus) {
+                    self.agentArray = repoPersonnelStatus
+                    self.agentArray.forEach(element => {
+                        element.agentStatus = self.AgentReasonMappingObject[element.agentStatus]
+                        // if(element.agentStatus !== '"LogOut"' || element.agentStatus !== 'agentStatus')
+                    })
+                    console.log(self.agentArray)
+                }
+            },
+            realTimeToWork(arrayData) {
+                return arrayData.filter((element, index, array) => {
+                    return parseInt(element.Date, 10) > 7 && parseInt(element.Date, 10) < 18 && parseInt(element.Date, 10) !== 12
+                })
+            },
+            getWaitCount() {
+                const self = this
+                return new Promise((resolve, reject) => {
+                    axios.post('http://192.168.10.42:8082/infotrends-web-agent/dashboard/pilot',
+                        Qs.stringify({
+                            tenantID: 3,
+                            agentID: 22512
+                        })
+                    ).then(res => {
+                        let repo = res.data.Pilot.filter(element => {
+                            return element.EntityTypeID === self.entityTypeID
+                        })
+                        resolve(repo);
+                    }).catch(err => {
+                        reject(err.data)
+                    })
+                })
+            },
+            getTimelyStatus() {
+                const self = this
+                return new Promise((resolve, reject) => {
+                    axios.post('http://192.168.10.42:8081/infotrends-api/queryRptData/ServicesCalls',
+                        Qs.stringify({
+                            startDate: `${self.today.getFullYear()}-${(self.today.getMonth() + 1)}-${self.today.getDate()} 00:00:00`,
+                            endDate: `${self.today.getFullYear()}-${(self.today.getMonth() + 1)}-${self.today.getDate()} 23:59:59`,
+                            tenantID: 3,
+                            entityTypeID: self.entityTypeID,
+                        })
+                    ).then(res => {
+                        resolve(res.data);
+                    }).catch(err => {
+                        reject(err.data)
+                    })
+                })
+            },
+            getTimeService() {
+                const self = this
+                return new Promise((resolve, reject) => {
+                    axios.post('http://192.168.10.42:8081/infotrends-api/queryRptData/ServicesReportByAvg',
+                        Qs.stringify({
+                            startDate: `${self.today.getFullYear()}-${(self.today.getMonth() + 1)}-${self.today.getDate()} 00:00:00`,
+                            endDate: `${self.today.getFullYear()}-${(self.today.getMonth() + 1)}-${self.today.getDate()} 23:59:59`,
+                            tenantID: 3,
+                            entityTypeID: self.entityTypeID,
+                        })
+                    ).then(res => {
+                        resolve(res.data);
+                    }).catch(err => {
+                        reject(err.data)
+                    })
+                });
+            },
+            getPersonnelStatus() {
+                const self = this
+                return new Promise((resolve, reject) => {
+                    axios.post('http://192.168.10.42:8082/infotrends-web-agent/dashboard/agent',
+                        Qs.stringify({
+                            tenantID: 3,
+                            agentID: 22512
+                        })
+                    ).then(res => {
+                        // filter entityTypeID
+                        let repo = res.data.Agent.filter(element => {
+                            return element.EntityTypeID === self.entityTypeID && element.agentState !== '0'
+                        })
+                        resolve(repo);
+                    }).catch(err => {
+                        reject(err.data)
+                    })
+                })
+            },
+            getAgentReasonByFlag() {
+                const self = this
+                return new Promise((resolve, reject) => {
+                    axios.post('http://192.168.10.42:8081/infotrends-api/queryData/AgentReasonByFlag',
+                        Qs.stringify({
+                            flag: 1,
+                            tenantID: 3
+                        })
+                    ).then(res => {
+                        resolve(res.data.AgentReason);
+                    }).catch(err => {
+                        reject(err.data)
+                    })
+                })
+            },
+            Echarts(element, timeInterval, data) {
+                let myChart = echarts.init(element)
+                let titlename = timeInterval
+                let valdata = []
+                let myColor = ['#3a87d9', '#3a87d9', '#fc8435', '#fc8435', '#d7393e', '#d7393e', '#d7393e']
+                data.forEach(element => {
+                    valdata.push(element + '%')
+                })
+                // console.log(data)
+                let option = {
+                    grid: {
+                        left: '18%',
+                        width: '67%',
+                        top: '5%',
+                        height: '80%',
+                    },
+
+                    xAxis: {
+                        show: true,
+                        // data: [0,20,40,60,80,100],
+                        axisLabel: {
+                            textStyle: {
+                                fontSize: 20,
+                                color: '#9c9c9c',
+                                fontFamily: "Helvetica",
+                            },
+                            formatter: (function (value) {
+                                value = (value.toString().indexOf(".") === -1) && (value.toString() !== '1') ? value : value * 100
+                                return value
+                            })
+
+
+                        },
+
+                    },
+                    yAxis: [
+                        {
+                            show: true,
+                            data: titlename,
+                            inverse: true,
+                            axisLine: {
+                                show: false
+                            },
+                            splitLine: {
+                                show: false
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            axisLabel: {
+                                textStyle: {
+                                    fontSize: 18,
+                                    color: '#58666e',
+                                    fontFamily: "Helvetica",
+                                },
+
+                            },
+
+                        },
+                        {
+                            show: true,
+                            inverse: true,
+                            data: valdata,
+                            label: {
+                                normal: {
+                                    formatter: '{c}%'
+                                }
+                            },
+                            axisLabel: {
+                                textStyle: {
+                                    fontSize: 28,
+                                    fontFamily: "Helvetica",
+                                    align: 'right',
+                                    padding: [0, -60, 0, 0],
+                                    color: function (value, index) {
+                                        var num = myColor.length;
+                                        return myColor[index % num]
+                                    }
+                                },
+                            },
+                            axisLine: {
+                                show: false
+                            },
+                            splitLine: {
+                                show: false
+                            },
+                            axisTick: {
+                                show: false
+                            },
+
+                        }],
+                    series: [{
+                        name: '接聽率',
+                        type: 'bar',
+                        yAxisIndex: 1,
+                        data: data,
+                        barWidth: 32,
+                        itemStyle: {
+                            normal: {
+                                barBorderRadius: 4,
+                                color: function (params) {
+                                    var num = myColor.length;
+                                    return myColor[params.dataIndex % num]
+                                },
+                            }
+                        },
+                        label: {
+                            normal: {
+                                show: false,
+                                position: 'inside',
+                                formatter: '{c}%'
+                            }
+                        },
+                    }]
+                }
+                myChart.setOption(option)
+            },
+            changeTimeToMS(secs) {
+                var hr = Math.floor(secs / 3600);
+                var min = Math.floor((secs - (hr * 3600)) / 60);
+                var sec = parseInt(secs - (hr * 3600) - (min * 60));
+
+                while (min.length < 2) { min = '0' + min; }
+                while (sec.length < 2) { sec = '0' + min; }
+                if (hr) hr += ':';
+                return hr + min + ':' + sec;
+            },
+            changeTimeToHMS(secs) {
+                var secondTime = parseInt(secs)
+                var minuteTime = 0
+                var hourTime = 0
+                if (secondTime > 60) {
+                    minuteTime = parseInt(secondTime / 60);
+                    secondTime = parseInt(secondTime % 60);
+                    if (minuteTime > 60) {
+                        hourTime = parseInt(minuteTime / 60);
+                        minuteTime = parseInt(minuteTime % 60);
+                    }
+                }
+
+                let second = parseInt(secondTime)
+                let minute = parseInt(minuteTime)
+                let hour = parseInt(hourTime)
+                if (second < 10) {
+                    second = '0' + second
+                }
+                if (minute < 10) {
+                    minute = '0' + minute
+                }
+                if (hour < 10) {
+                    hour = '0' + hour
+                }
+                return hour + ":" + minute + ":" + second
+            }
+        },
+    })
+    const tmnewaDashboard = new Vue({
+        el: '#tmnewaDashboard',
+        mounted() {
+            var swiper = new Swiper('.swiper-container', {
+                autoHeight: true, //enable auto height
+                autoplay: {
+                    delay: 30000,
+                },
+                effect: 'fade',
+            });
+        },
+
+    })
+
+
+</script>
+
+</html>
