@@ -54,8 +54,8 @@
     <app id="tmnewaDashboard">
         <div class="swiper-container">
             <div class="swiper-wrapper">
-                <tmnewa-dash-board :entity-type-i-d="'2'"></tmnewa-dash-board>
                 <tmnewa-dash-board :entity-type-i-d="'1'"></tmnewa-dash-board>
+                <tmnewa-dash-board :entity-type-i-d="'2'"></tmnewa-dash-board>
             </div>
         </div>
     </app>
@@ -574,11 +574,11 @@
                 if (hour < 10) {
                     hour = '0' + hour
                 }
-               
-                if(isNaN(second)){
+
+                if (isNaN(second)) {
                     second = '00'
                 }
-         
+
                 // 判斷是否要輸出 '時'
                 if (MS) {
                     return minute + ":" + second
