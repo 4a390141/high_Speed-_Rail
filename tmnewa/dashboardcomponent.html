@@ -28,6 +28,26 @@
             "Content-Type": "application/x-www-form-urlencoded"
         }
     </script>
+    <style>
+        .marqueeList {
+            width: 100%;
+            position: relative;
+        }
+
+        .marqueeList li {
+            width: 100%;
+            font-weight: 600
+        }
+
+        .marqueeList li:first-child {
+            position: relative;
+        }
+
+        .marqueeList li:nth-child(n+2) {
+            position: absolute;
+            top: 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -47,17 +67,30 @@
 
 </body>
 
-<!-- <script type="text/javascript" src="js/bar.js"></script> -->
 
 <script>
-
+    // 跑馬燈動畫
+    MarqueeTime = 0
+    MarqueeId = requestAnimationFrame(MarqueeGo)
+    function MarqueeGo() {
+        MarqueeTime += 0.169;
+        let marqueeList = document.getElementsByClassName('marqueeList')
+        for (let i = 0; i < marqueeList.length; i++) {
+            marqueeItemLength = marqueeList[i].getElementsByTagName('li').length
+            if (MarqueeTime > (marqueeItemLength * 100)) {
+                MarqueeTime = 0
+            }
+            marqueeList[i].style.transform = `translateX(-${MarqueeTime}%)`
+        }
+        MarqueeId = requestAnimationFrame(MarqueeGo)
+    }
     Vue.component('tmnewa-dash-board', {
         template: `
         <div class="swiper-slide">
         <div class="chat">
             <article class="article">
                 <div class="col-left">
-                    <section class="block green mb-25">
+                    <section :class="entityTypeID==='1'?'block green mb-25':'block orange mb-25'">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="default">
                             <tr>
                                 <th class="title" width="10%">
@@ -72,7 +105,7 @@
                                             <div class="d-table">
                                                 <div class="v-middle">
                                                     <p class="text">接聽率</p>
-                                                    <p class="num font-blue">{{ timeServicePresent }}<span>%</span></p>
+                                                    <p class="num font-blue">{{ timeServicePresent || 0 }}<span>%</span></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -82,7 +115,7 @@
                             </tr>
                         </table>
                     </section>
-                    <section class="block yellow mb-23 message">
+                    <section :class="entityTypeID==='1'?'block yellow mb-23 message':'block blue mb-23 message'">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="default border">
                             <tr>
                                 <th rowspan="2" class="title" width="10%">
@@ -93,7 +126,7 @@
                                 </th>
                                 <td colspan="2" width="45%" class="bt-0">
                                     <p class="text">等待人數</p>
-                                    <p class="num font-red">{{ waitingCount }}</p>
+                                    <p class="num font-red">{{ waitingCount || 0}}</p>
                                 </td>
                                 <td colspan="2" width="45%" class="bt-0">
                                     <p class="text">等待時間</p>
@@ -122,7 +155,7 @@
                     </section>
                 </div>
                 <div class="col-right">
-                    <section class="block green-w member">
+                    <section :class="entityTypeID==='1'?'block green-w member':'block orange-w member'">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="default">
                             <tr class="title">
                                 <th>服務人員</th>
@@ -132,7 +165,7 @@
                             </tr>
                             <tr v-for="item in agentArray">
                                 <td class="bold">{{ item['agentName'] }}</td>
-                                <td class="bold online-b"><span class="circle"></span>{{ item['agentStatus'] }}</td>
+                                <td class="bold online-b" :style="'color:'+item['agentStatusColor']"><span class="circle" :style="'background:'+item['agentStatusColor']"></span>{{ item['agentStatusName'] }}</td>
                                 <td>{{ changeTimeToHMS((parseInt(item['agentStatusDurationTime'],10)/1000)) }}</td>
                                 <td>00:00:00</td>
                             </tr>
@@ -140,17 +173,26 @@
                     </section>
                 </div>
             </article>
-            <footer class="footer">
+            <footer :class="entityTypeID==='1'?'footer':'footer red'">
                 <div class="col-left">
                     <div class="marquee">
                         <i class="icon-marquee"></i>
-                        <marquee direction="left" scrollamount="5">不必在現場大喊，一鍵就能送出通知，自動發送簡訊或Email提醒即將可入座的顧客不必在現場
+                        <marquee v-if="false" ref="marquee" direction="left" scrollamount="4" :style="'color:' + nowMarquee.Color">
+                        {{ nowMarquee.Content }}
                         </marquee>
+                        <div style="overflow: hidden;width: 100%;">
+                            <ul class="marqueeList" ref="marqueeList">
+                                <li ref="marqueeItem" v-for="item,index in MarqueeArray" :style="'transform:translateX('+(index+1)+'00%)'">
+                                    {{ item.Content }}
+                                </li>    
+                        <ul/>
+                        </div>
+
                     </div>
                 </div>
                 <div class="col-right">
-                    <p>2019年06月01日</p>
-                    <p>星期六 11:59:59</p>
+                    <p>{{ todayFrom.year }}年{{ todayFrom.month }}月{{ todayFrom.day }}日</p>
+                    <p>星期{{ todayFrom.week }} {{ todayFrom.hour }}:{{ todayFrom.minutes }}:{{ todayFrom.second }}</p>
                 </div>
             </footer>
         </div>
@@ -171,10 +213,10 @@
                 waitingCount: 0,
                 waitingTime: 0,
                 agentArray: [],
-                AgentReasonMappingObject: {
-                    'LogOut': '未就緒',
-                    'LogInt': '就緒'
-                }
+                AgentReasonMappingObject: {},
+                todayFrom: {},
+                MarqueeArray: [],
+                nowMarquee: {},
             }
         },
         computed: {
@@ -192,8 +234,34 @@
                     self.reloadsource()
                 }
             }
-            // 30秒更新一次
-            system1000mTimer.postMessage({ start: true, ms: 5000 })
+            // 15秒更新一次
+            system1000mTimer.postMessage({ start: true, ms: 15000 })
+
+            // 右下時間
+            let systemmTimer = new Worker('js/interval.js')
+            let weekList = ['日', '一', '二', '三', '四', '五', '六']
+            systemmTimer.onmessage = function (event) {
+                if (event.data === 'time.tick') {
+                    self.todayFrom = {}
+                    self.todayFrom = {
+                        year: new Date().getFullYear(),
+                        month: self.BecomeDoubleDigit((new Date().getMonth() + 1)),
+                        day: self.BecomeDoubleDigit(new Date().getDate()),
+                        week: weekList[new Date().getDay()],
+                        hour: self.BecomeDoubleDigit(new Date().getHours()),
+                        minutes: self.BecomeDoubleDigit(new Date().getMinutes()),
+                        second: self.BecomeDoubleDigit(new Date().getSeconds())
+                    }
+                }
+            }
+            // 每秒更新一次
+            systemmTimer.postMessage({ start: true, ms: 1000 })
+
+            // 跑馬燈資料
+            self.getMarqueeByPerson().then(data => {
+                self.MarqueeArray = data.MarqueeByPerson
+            })
+
         },
         methods: {
             async reloadsource() {
@@ -212,8 +280,8 @@
                         data.push(element.FinishPercentage)
                     })
                     self.timeServicePresent = Math.round((parseInt(repoTimeService.FinishCallsCount, 10) / parseInt(repoTimeService.CallCount, 10) * 100))
-                    self.AvgprocessingTime = repoTimeService.AvgprocessingTime
-                    console.table(repoTimeService)
+                    self.AvgprocessingTime = self.changeTimeToHMS(repoTimeService.AvgprocessingTime, true)
+                    // console.table(repoTimeService)
                     self.Echarts(self.$refs.main, timeInterval, data)
 
                 }
@@ -225,7 +293,7 @@
                 }
                 // 等待人數 等待時間
                 let repoWaitCount = await self.getWaitCount()
-                console.log(repoWaitCount)
+                // console.log(repoWaitCount)
                 if (repoWaitCount) {
                     let tempWaitingTimeArray = []
                     self.waitingCount = 0
@@ -235,30 +303,42 @@
                         tempWaitingTimeArray.push(parseInt(element.clientWaittingAvgTime, 10))
                     })
 
-                    self.waitingTime = self.changeTimeToMS(Math.max(...tempWaitingTimeArray))
+                    self.waitingTime = self.changeTimeToHMS(Math.max(...tempWaitingTimeArray))
+                    // console.log(tempWaitingTimeArray)
+                    // console.log(self.waitingTime)
                 }
                 // 人員列表
                 let repoAgentReasonByFlag = await self.getAgentReasonByFlag()
-                console.log(repoAgentReasonByFlag)
                 repoAgentReasonByFlag.forEach(element => {
-                    self.AgentReasonMappingObject[element.DBID] = element.StatusName
+                    self.AgentReasonMappingObject[element.DBID.toString()] = {}
+                    self.AgentReasonMappingObject[element.DBID.toString()]['StatusName'] = element.StatusName
+                    self.AgentReasonMappingObject[element.DBID.toString()]['AlarmColor'] = element.AlarmColor
                 })
+                self.AgentReasonMappingObject['NotReady'] = {
+                    StatusName: '未就緒',
+                    AlarmColor: '#d7393e'
+                }
+                self.AgentReasonMappingObject['Ready'] = {
+                    StatusName: '就緒',
+                    AlarmColor: '#18a689'
+                }
 
                 let repoPersonnelStatus = await self.getPersonnelStatus()
                 if (repoPersonnelStatus) {
                     self.agentArray = repoPersonnelStatus
                     self.agentArray.forEach(element => {
-                        element.agentStatus = self.AgentReasonMappingObject[element.agentStatus]
-                        // if(element.agentStatus !== '"LogOut"' || element.agentStatus !== 'agentStatus')
+                        element['agentStatusName'] = self.AgentReasonMappingObject[element.agentStatus].StatusName
+                        element['agentStatusColor'] = self.AgentReasonMappingObject[element.agentStatus].AlarmColor
                     })
-                    console.log(self.agentArray)
                 }
             },
+            // 選取 8點到18點的時間
             realTimeToWork(arrayData) {
                 return arrayData.filter((element, index, array) => {
                     return parseInt(element.Date, 10) > 7 && parseInt(element.Date, 10) < 18 && parseInt(element.Date, 10) !== 12
                 })
             },
+            // 等待數量
             getWaitCount() {
                 const self = this
                 return new Promise((resolve, reject) => {
@@ -321,9 +401,12 @@
                         })
                     ).then(res => {
                         // filter entityTypeID
-                        let repo = res.data.Agent.filter(element => {
-                            return element.EntityTypeID === self.entityTypeID && element.agentState !== '0'
+                        let repo = []
+                        repo = res.data.Agent.filter(element => {
+                            return (element.EntityTypeID === self.entityTypeID && element.agentStatus && element.agentStatus !== 'LogOut')
                         })
+
+                        // console.table(repo)
                         resolve(repo);
                     }).catch(err => {
                         reject(err.data)
@@ -462,20 +545,15 @@
                 }
                 myChart.setOption(option)
             },
-            changeTimeToMS(secs) {
-                var hr = Math.floor(secs / 3600);
-                var min = Math.floor((secs - (hr * 3600)) / 60);
-                var sec = parseInt(secs - (hr * 3600) - (min * 60));
-
-                while (min.length < 2) { min = '0' + min; }
-                while (sec.length < 2) { sec = '0' + min; }
-                if (hr) hr += ':';
-                return hr + min + ':' + sec;
+            BecomeDoubleDigit(value) {
+                if (value.toString().length === 1) {
+                    return value = '0' + value
+                } else { return value }
             },
-            changeTimeToHMS(secs) {
-                var secondTime = parseInt(secs)
-                var minuteTime = 0
-                var hourTime = 0
+            changeTimeToHMS(secs, MS) {
+                let secondTime = parseInt(secs)
+                let minuteTime = 0
+                let hourTime = 0
                 if (secondTime > 60) {
                     minuteTime = parseInt(secondTime / 60);
                     secondTime = parseInt(secondTime % 60);
@@ -484,7 +562,6 @@
                         minuteTime = parseInt(minuteTime % 60);
                     }
                 }
-
                 let second = parseInt(secondTime)
                 let minute = parseInt(minuteTime)
                 let hour = parseInt(hourTime)
@@ -497,10 +574,39 @@
                 if (hour < 10) {
                     hour = '0' + hour
                 }
-                return hour + ":" + minute + ":" + second
+               
+                if(isNaN(second)){
+                    second = '00'
+                }
+         
+                // 判斷是否要輸出 '時'
+                if (MS) {
+                    return minute + ":" + second
+                } else {
+                    return hour + ":" + minute + ":" + second
+                }
+            },
+            getMarqueeByPerson() {
+                const self = this
+                return new Promise((resolve, reject) => {
+                    axios.post('http://192.168.10.42:8081/infotrends-api/queryData/MarqueeByPerson',
+                        Qs.stringify({
+                            personID: 22512,
+                            tenantID: 3
+                        })
+                    ).then(res => {
+                        resolve(res.data)
+                    }).catch(err => {
+                        reject(err.data)
+                    })
+                })
             }
         },
     })
+
+
+
+
     const tmnewaDashboard = new Vue({
         el: '#tmnewaDashboard',
         mounted() {
@@ -510,7 +616,7 @@
                     delay: 30000,
                 },
                 effect: 'fade',
-            });
+            })
         },
 
     })
