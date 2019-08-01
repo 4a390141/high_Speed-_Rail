@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <style>
+        .ooxx {
+            height: 200px;
+            width: 200px;
+            background-color: cadetblue
+        }
+    </style>
+    <div class="ooxx"></div>
+    <button id="kkk">kkk</button>
+    <script>
+
+        var ooxx = {
+            oo: {
+                xx: 1
+            }
+        }
+        // var log = new Object
+        var logger = {
+            fontSize: '15',
+            option: {
+                isEnabled: false
+            },
+            log: function (content = '', value = '') {
+                const self = this
+                console.log("%c[log]", `color: black;font-size:${self.fontSize}px`, content, value)
+            },
+            info: function (content = '', value = '') {
+                const self = this
+                console.log("%c[info]", `color: blue;font-size:${self.fontSize}px;background-color:lightblue;`, content, value)
+            },
+            warn: function (content = '', value = '') {
+                const self = this
+                console.warn("%c[warn] " + (typeof content === 'object' ? JSON.stringify(content) : content), `color: goldenrod;font-size:${self.fontSize}px;`, value)
+                // console.warn("%c[info]", `color: goldenrod;font-size:${self.fontSize}px;`, content, value)
+            },
+            error: function (content = '', value = '') {
+                const self = this
+
+                console.error("%c[error] " + (typeof content === 'object' ? JSON.stringify(content) : content), `color: red;font-size:${self.fontSize}px`, value)
+            }
+        }
+
+        xxx = [1, 2, 3, 4, 5]
+        jjj = 'hi'
+        e = 1122323
+        logger.log(typeof xxx, 1)
+        logger.info('你好', ooxx)
+        logger.warn('scrollBar 尚未找到', jjj)
+        logger.error(ooxx, e)
+
+        // function log(rank, content, option) {
+        //     switch(rank){
+        //         case 'log':
+        //         console.log("%c[log] " + content + ":", "color: blue;font-size:15px")
+        //         break
+        //         case 'info':
+        //         console.info("%c[info] " + content + ":", "color: blue;font-size:15px")
+        //         break
+        //         case 'warn':
+        //         console.warn("%c[warn] " + content + ":", "color: darkkhaki;font-size:15px")
+        //         break
+        //         case 'error':
+        //         console.error("%c[error] " + content + ":", "color: red;font-size:15px")
+        //         break
+        //     }
+        // }
+
+        // let timeRun = 0
+
+        // kkk = document.getElementById('kkk')
+        // kkk.addEventListener('click', () => {
+        //     $('.ooxx').stop(true, true).show()
+        // })
+        // // $('.ooxx').fadeOut(300).fadeIn(400)
+        // $('.ooxx').delay(701).stop(true, true).stop(true, true).show()
+        // $('.ooxx').fadeOut(300).fadeIn(400).fadeOut(300).fadeIn(400).fadeOut(300).fadeIn(400)
+
+        // setTimeout(()=>{
+        //     $('.ooxx').stop(true, true).show()
+        // },600)  
+        // let interval = setInterval(function (param) {
+        //     timeRun++
+        //     if (timeRun === 3) { clear(interval) }
+        //     $('.ooxx').fadeOut(300).fadeIn(400).fadeOut(300).fadeIn(400).fadeOut(300).fadeIn(400)
+        // }, 200)
+
+        function clear(timeID) {
+            $('.ooxx').stop(true, true).show()
+            clearInterval(timeID)
+        }
+    </script>
+</body>
+
+</html>

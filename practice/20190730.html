@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://cdn.bootcss.com/vue/2.4.2/vue.min.js"></script>
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="app" v-cloak>
+      <!-- <button @click="doIt">Do It</button> -->
+      <cat name="my cat">
+        <kitten></kitten>
+      </cat>
+    </div>
+    <script>
+      Vue.config.productionTip = false
+      Vue.config.devtools = false
+
+      // Vue.config.errorHandler = function(err, vm, info) {
+      //   console.log(err)
+      //   console.log(`Error: ${err.toString()}\nInfo: ${info}`)
+      // }
+
+      // Vue.config.warnHandler = function(msg, vm, trace) {
+      //   console.log(`Warn: ${msg}\nTrace: ${trace}`)
+      // }
+      Vue.component('cat', {
+        template: `
+          <div><h1>Cat: </h1>
+            <slot></slot>
+          </div>`,
+        props: {
+          name: {
+            required: true,
+            type: String
+          }
+        },
+        errorCaptured(err, vm, info) {
+          console.log(`cat EC: ${err.toString()}\ninfo: ${info}`)
+          return false
+        }
+      })
+      Vue.component('kitten', {
+        template: '<div><h1>Kitten: {{ dontexist() }}</h1></div>',
+        props: {
+          name: {
+            required: true,
+            type: String
+          }
+        }
+      })
+      const app = new Vue({
+        el: '#app',
+        methods: {
+          doIt() {
+            return x
+          }
+        }
+      })
+    </script>
+  </body>
+</html>

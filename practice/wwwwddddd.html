@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <h1>this is index</h1>
+    <iframe
+      id="myframe"
+      src="https://rd-dev.onead.tw/test_demo/2019/0726/iframPage.html"
+      frameborder="0"
+    ></iframe>
+    <!-- <iframe id="myframe" src="./iframPage.html" frameborder="0"></iframe> -->
+    <br /><br />
+    <input type="text" id="message" /><input
+      type="button"
+      value=""
+      onclick="sendIt()"
+    />
+    <script>
+      let oW = document.body.offsetWidth
+      console.log('視窗寬度:', oW)
+      // idnex.html
+      //獲取iframe元素
+      iFrame = document.getElementById('myframe')
+      //iframe加載完畢後再發送消息，否則子頁面接收不到message
+      iFrame.onload = function() {
+        //iframe加載完立即發送一條消息
+        iFrame.contentWindow.postMessage(oW, '*')
+      }
+      function myfunction() {
+        funcA(funcB)
+      }
+
+      function funcA(callback) {
+        window.setTimeout(function() {
+          console.log('fistt function finished')
+          if (typeof callback == 'function') {
+            callback()
+          }
+        }, 100)
+      }
+
+      function funcB() {
+        setTimeout(function() {
+          //傳送高度
+          let cH = document.body.clientHeight
+          console.log('視窗高度', cH)
+          //iframe加載完畢後再發送消息，否則子頁面接收不到message
+          iFrame.onload = function() {
+            //iframe加載完立即發送一條消息
+            iFrame.contentWindow.postMessage(cH, '*')
+          }
+        }, 5000)
+      }
+
+      window.addEventListener('load', myfunction)
+    </script>
+  </body>
+</html>

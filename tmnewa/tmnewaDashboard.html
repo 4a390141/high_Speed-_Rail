@@ -156,22 +156,26 @@
                 return {
                     today: new Date(),
                     timeServiceData: [],
-                    timeServicePresent: 0
+                    timeServicePresent: 0,
+                    count: 0,
+                    countMinute: 0
                 }
             },
             mounted() {
                 const self = this
                 self.reloadSource()
-                let system1000mTimer = new Worker('js/interval.js')
-                system1000mTimer.onmessage = async function (event) {
-                    if (event.data === 'time.tick') {
-                        self.reloadSource()
-                    }
-                }
-                // 15秒更新一次
-                system1000mTimer.postMessage({ start: true, ms: 15000 })
+                // 計時器啟動
+                self.timerStart()
             },
             methods: {
+                timeWalking() {
+                    const self = this
+                    self.countMinute++
+                    if (self.countMinute > 30) {
+                        self.reloadSource()
+                        self.countMinute = 0
+                    }
+                },
                 async reloadSource() {
                     const self = this
                     // api 回傳資料
@@ -215,6 +219,21 @@
                     return arrayData.filter((element, index, array) => {
                         return parseInt(element.Date, 10) > 7 && parseInt(element.Date, 10) < 18 && parseInt(element.Date, 10) !== 12
                     })
+                },
+                // 計時器啟動
+                timerStart() {
+                    const self = this
+                    requestAnimationFrame(self.timer)
+                },
+                // 計時器
+                timer() {
+                    const self = this
+                    self.count++
+                    if (self.count >= fps) {
+                        self.timeWalking()
+                        self.count = 0
+                    }
+                    requestAnimationFrame(self.timer)
                 },
                 changeTimeToHMS(secs, MS) {
                     let secondTime = parseInt(secs)
@@ -425,6 +444,8 @@
                     AvgprocessingTime: 0,
                     waitingCount: 0,
                     waitingTime: 0,
+                    count: 0,
+                    countMinute: 0
                 }
             },
             computed: {
@@ -436,16 +457,19 @@
             mounted() {
                 const self = this
                 self.reloadSource()
-                let system1000mTimer = new Worker('js/interval.js')
-                system1000mTimer.onmessage = async function (event) {
-                    if (event.data === 'time.tick') {
-                        self.reloadSource()
-                    }
-                }
-                // 15秒更新一次
-                system1000mTimer.postMessage({ start: true, ms: 15000 })
+                // 計時器啟動
+                self.timerStart()
+
             },
             methods: {
+                timeWalking() {
+                    const self = this
+                    self.countMinute++
+                    if (self.countMinute > 30) {
+                        self.reloadSource()
+                        self.countMinute = 0
+                    }
+                },
                 async reloadSource() {
                     const self = this
                     let repoTimelyStatus = await self.getTimelyStatus()
@@ -467,7 +491,7 @@
                             tempWaitingTimeArray.push(parseInt(element.clientWaittingAvgTime, 10))
                         })
 
-                        self.waitingTime = self.changeTimeToHMS(Math.max(...tempWaitingTimeArray),true)
+                        self.waitingTime = self.changeTimeToHMS(Math.max(...tempWaitingTimeArray), true)
                     }
                 },
                 getTimelyStatus() {
@@ -505,6 +529,21 @@
                             console.error('select', err.data)
                         })
                     })
+                },
+                // 計時器啟動
+                timerStart() {
+                    const self = this
+                    requestAnimationFrame(self.timer)
+                },
+                // 計時器
+                timer() {
+                    const self = this
+                    self.count++
+                    if (self.count >= fps) {
+                        self.timeWalking()
+                        self.count = 0
+                    }
+                    requestAnimationFrame(self.timer)
                 },
                 changeTimeToHMS(secs, MS) {
                     let secondTime = parseInt(secs)
@@ -561,7 +600,7 @@
                         <td class="bold online-b" :style="'color:'+item['agentStatusColor']"><span class="circle"
                                 :style="'background:'+item['agentStatusColor']"></span>{{ item['agentStatusName'] }}</td>
                         <td>{{ changeTimeToHMS((parseInt(item['agentStatusDurationTime'],10)/1000)) }}</td>
-                        <td>00:00:00</td>
+                        <td>{{ item['AgentOnlineTime'] }}</td>
                     </tr>
                 </table>
             </div>
@@ -573,6 +612,9 @@
                 return {
                     agentArray: [],
                     AgentReasonMappingObject: {},
+                    count: 0,
+                    countMinute: 0,
+                    today: new Date(),
                 }
             },
             watch: {
@@ -589,20 +631,26 @@
             mounted() {
                 const self = this
                 self.reloadSource()
-                let system1000mTimer = new Worker('js/interval.js')
-                system1000mTimer.onmessage = async function (event) {
-                    if (event.data === 'time.tick') {
-                        self.reloadSource()
-                    }
-                }
-                // 15秒更新一次
-                system1000mTimer.postMessage({ start: true, ms: 15000 })
+                // 計時器啟動
+                self.timerStart()
             },
             methods: {
+                timeWalking() {
+                    const self = this
+                    self.countMinute++
+                    if (self.countMinute > 30) {
+                        self.reloadSource()
+                        self.countMinute = 0
+                    }
+
+                },
                 async reloadSource() {
                     const self = this
                     // 人員列表
                     let repoAgentReasonByFlag = await self.getAgentReasonByFlag()
+                    let repoPersonnelStatus = await self.getPersonnelStatus()
+                    let repoServicePerformance = await self.getServicePerformance()
+
                     repoAgentReasonByFlag.forEach(element => {
                         self.AgentReasonMappingObject[element.DBID.toString()] = {}
                         self.AgentReasonMappingObject[element.DBID.toString()]['StatusName'] = element.StatusName
@@ -617,7 +665,6 @@
                         AlarmColor: '#18a689'
                     }
 
-                    let repoPersonnelStatus = await self.getPersonnelStatus()
                     if (repoPersonnelStatus) {
                         self.agentArray = repoPersonnelStatus
                         self.agentArray.forEach(element => {
@@ -625,6 +672,21 @@
                             element['agentStatusColor'] = self.AgentReasonMappingObject[element.agentStatus].AlarmColor
                         })
                     }
+
+                    // 職勤時間       
+                    if (self.agentArray.length > 0) {
+                        self.agentArray.forEach(element => {
+                            let findAgent = repoServicePerformance.find(agentItem => {
+                                return agentItem.Agent === element.agentName
+                            })
+                            if (findAgent) {
+                                element['AgentOnlineTime'] = findAgent.AgentOnlineTime
+                            }else{
+                                element['AgentOnlineTime'] = '00:00:00'
+                            }
+                        })
+                    }
+
                 },
                 getAgentReasonByFlag() {
                     const self = this
@@ -636,6 +698,28 @@
                             })
                         ).then(res => {
                             resolve(res.data.AgentReason);
+                        }).catch(err => {
+                            console.error('select', err.data)
+                        })
+                    })
+                },
+                getServicePerformance() {
+                    const self = this
+                    return new Promise((resolve, reject) => {
+                        axios.post('http://192.168.10.42:8081/infotrends-api/queryRptData/ServicePerformanceReport',
+                            Qs.stringify({
+                                startDate: `${self.today.getFullYear()}-${(self.today.getMonth() + 1)}-${self.today.getDate()} 00:00:00`,
+                                startTime: '08: 00',
+                                endDate: `${self.today.getFullYear()}-${(self.today.getMonth() + 1)}-${self.today.getDate()} 23:59:59`,
+                                endTime: '18:00',
+                                pilotIDs: '',
+                                agentIDs: '',
+                                entityTypeID: self.entityTypeID,
+                                inServicetime: '',
+                                tenantID: 3,
+                            })
+                        ).then(res => {
+                            resolve(res.data.ServicePerformanceReport);
                         }).catch(err => {
                             console.error('select', err.data)
                         })
@@ -661,6 +745,21 @@
                             console.error('select', err.data)
                         })
                     })
+                },
+                // 計時器啟動
+                timerStart() {
+                    const self = this
+                    requestAnimationFrame(self.timer)
+                },
+                // 計時器
+                timer() {
+                    const self = this
+                    self.count++
+                    if (self.count >= fps) {
+                        self.timeWalking()
+                        self.count = 0
+                    }
+                    requestAnimationFrame(self.timer)
                 },
                 changeTimeToHMS(secs, MS) {
                     let secondTime = parseInt(secs)
@@ -737,30 +836,13 @@
                     todayFrom: {},
                     MarqueeArray: [],
                     nowMarquee: {},
+                    count: 0
                 }
             },
             mounted() {
                 const self = this
-                // 右下時間
-                let systemmTimer = new Worker('js/interval.js')
-                let weekList = ['日', '一', '二', '三', '四', '五', '六']
-                systemmTimer.onmessage = function (event) {
-                    if (event.data === 'time.tick') {
-                        self.todayFrom = {}
-                        self.todayFrom = {
-                            year: new Date().getFullYear(),
-                            month: self.BecomeDoubleDigit((new Date().getMonth() + 1)),
-                            day: self.BecomeDoubleDigit(new Date().getDate()),
-                            week: weekList[new Date().getDay()],
-                            hour: self.BecomeDoubleDigit(new Date().getHours()),
-                            minutes: self.BecomeDoubleDigit(new Date().getMinutes()),
-                            second: self.BecomeDoubleDigit(new Date().getSeconds())
-                        }
-                    }
-                }
-                // 每秒更新一次
-                systemmTimer.postMessage({ start: true, ms: 1000 })
-
+                // 計時器啟動
+                self.timerStart()
                 // 跑馬燈資料
                 self.reloadSource()
             },
@@ -792,6 +874,37 @@
                         return value = '0' + value
                     } else { return value }
                 },
+                timeWalking() {
+                    const self = this
+                    // 右下時間
+
+                    let weekList = ['日', '一', '二', '三', '四', '五', '六']
+                    self.todayFrom = {}
+                    self.todayFrom = {
+                        year: new Date().getFullYear(),
+                        month: self.BecomeDoubleDigit((new Date().getMonth() + 1)),
+                        day: self.BecomeDoubleDigit(new Date().getDate()),
+                        week: weekList[new Date().getDay()],
+                        hour: self.BecomeDoubleDigit(new Date().getHours()),
+                        minutes: self.BecomeDoubleDigit(new Date().getMinutes()),
+                        second: self.BecomeDoubleDigit(new Date().getSeconds())
+                    }
+                },
+                // 計時器啟動
+                timerStart() {
+                    const self = this
+                    requestAnimationFrame(self.timer)
+                },
+                // 計時器
+                timer() {
+                    const self = this
+                    self.count++
+                    if (self.count >= fps) {
+                        self.timeWalking()
+                        self.count = 0
+                    }
+                    requestAnimationFrame(self.timer)
+                }
             },
         })
 
@@ -824,6 +937,25 @@
             }, 0)
 
         }
+
+
+        var times = []
+        var fps = 60
+
+        // 取得 FPS
+        getFPS()
+        function getFPS() {
+            requestAnimationFrame(() => {
+                const now = performance.now()
+                while (times.length > 0 && times[0] <= now - 1000) {
+                    times.shift()
+                }
+                times.push(now)
+                fps = times.length
+                getFPS()
+            })
+        }
+
     </script>
 </body>
 
