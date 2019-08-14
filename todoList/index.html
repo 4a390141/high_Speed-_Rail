@@ -1,186 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>todoList</title>
     <!-- vue -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
     <!-- bootstrap -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"
+    />
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
-        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+      integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay"
+      crossorigin="anonymous"
+    />
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gremlins.js/0.1.0/gremlins.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gremlins.js/0.1.0/gremlins.min.js"></script>
     <style>
-        form {
-            display: inline-block;
-        }
+      form {
+        display: inline-block;
+      }
 
-        .form-group {
-            text-align: center;
-            padding-bottom: 25px;
-        }
+      .form-group {
+        text-align: center;
+        padding-bottom: 25px;
+      }
 
-        .todo {
-            margin: 0 auto;
-            width: 100%;
-            max-width: 500px;
-        }
+      .todo {
+        margin: 0 auto;
+        width: 100%;
+        max-width: 500px;
+      }
 
-        a.close {
-            float: right;
-        }
+      a.close {
+        float: right;
+      }
 
-        .todo li input:checked::before {
-            content: '';
-            position: absolute;
-            border-color: rgb(4, 0, 252);
-            border-style: solid;
-            display: block;
-            width: 100%;
-            top: 50%;
-            height: 1px;
-        }
+      .todo li input:checked::before {
+        content: '';
+        position: absolute;
+        border-color: rgb(4, 0, 252);
+        border-style: solid;
+        display: block;
+        width: 100%;
+        top: 50%;
+        height: 1px;
+      }
 
-        .todo li {
-            cursor: pointer;
-            position: relative;
-            padding: 12px 0px 12px 0px;
-            list-style-type: none;
-            background: #eee;
-            font-size: 18px;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
+      .todo li {
+        cursor: pointer;
+        position: relative;
+        padding: 12px 0px 12px 0px;
+        list-style-type: none;
+        background: #eee;
+        font-size: 18px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
 
-        .fas,
-        button {
-            cursor: pointer;
-        }
+      .fas,
+      button {
+        cursor: pointer;
+      }
 
-        .fas:hover,
-        button:hover,
-        .far:hover {
-            transform: scale(1.15)
-        }
+      .fas:hover,
+      button:hover,
+      .far:hover {
+        transform: scale(1.15);
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="app">
-        <div class="form-group">
-            <h1>To-Do <small>List</small></h1>
-            <div role="form" style="display:inline-block;">
-                <input type="text" class="form-control" v-model.trim="inputValue" placeholder="Your Task" name="task">
-            </div>
-            <button type="button" class="btn btn btn-primary" @click="createItem">Add</button>
-            <!-- <button type="button" class="btn btn btn-primary" @click="readList">save</button> -->
+      <div class="form-group">
+        <h1>To-Do <small>List</small></h1>
+        <div role="form" style="display:inline-block;">
+          <input
+            type="text"
+            class="form-control"
+            v-model.trim="inputValue"
+            placeholder="Your Task"
+            name="task"
+          />
         </div>
+        <button type="button" class="btn btn btn-primary" @click="createItem">
+          Add
+        </button>
+        <!-- <button type="button" class="btn btn btn-primary" @click="readList">save</button> -->
+      </div>
 
-        <ul class="list-unstyled todo">
-            <li class="" v-for="e,i in list">
-                <input type="checkbox" class="form-control" @change.stop.prevent="updateItemisComplete(e,i)"
-                    :data-isComplete="e.isComplete" style="width: 8%; display: inline;" :checked="e.isComplete == 'Y'">
-                <input type="text" class="form-control" v-model="e.value" style="width: 60%; display: inline; "
-                    readonly="readonly">
-                <i class="fas fa-chevron-up" @click="updateItemIndex('up',i)" style="width: 8%;"></i>
-                <i class="fas fa-chevron-down" @click="updateItemIndex('down',i)" style="width: 8%;"></i>
-                <span><i class="far fa-trash-alt" @click="deleteItem(i)"></i></span>
-            </li>
-        </ul>
-        <div class="cover"></div>
+      <ul class="list-unstyled todo">
+        <li class="" v-for="e,i in list">
+          <input
+            type="checkbox"
+            class="form-control"
+            @change.stop.prevent="updateItemisComplete(e,i)"
+            :data-isComplete="e.isComplete"
+            style="width: 8%; display: inline;"
+            :checked="e.isComplete == 'Y'"
+          />
+          <input
+            type="text"
+            class="form-control"
+            v-model="e.value"
+            style="width: 60%; display: inline; "
+            readonly="readonly"
+          />
+          <i
+            class="fas fa-chevron-up"
+            @click="updateItemIndex('up',i)"
+            style="width: 8%;"
+          ></i>
+          <i
+            class="fas fa-chevron-down"
+            @click="updateItemIndex('down',i)"
+            style="width: 8%;"
+          ></i>
+          <span><i class="far fa-trash-alt" @click="deleteItem(i)"></i></span>
+        </li>
+      </ul>
+      <div class="cover"></div>
     </div>
-</body>
-<script>
+  </body>
+  <script>
     new Vue({
-        el: "#app",
-        mounted() {
-            const self = this;
-            self.list = self.readList()
+      el: '#app',
+      mounted() {
+        const self = this
+        self.list = self.readList()
+      },
+      watch: {
+        list: function() {
+          const self = this
+          return self.readList()
+        }
+      },
+      data: {
+        inputValue: '',
+        list: [],
+        ItemisComplete: []
+      },
+      methods: {
+        readList() {
+          const self = this
+          let todoList =
+            localStorage.getItem('todoList') ||
+            localStorage.setItem('todoList', JSON.stringify(self.list))
+          return JSON.parse(todoList).sort(function(a, b) {
+            return a.sort - b.sort
+          })
         },
-        watch: {
-            list: function () {
-                const self = this
-                return self.readList()
-            },
+        createItem() {
+          const self = this
+          if (self.inputValue.length === 0) {
+            alert('空值')
+            return false
+          }
+          let sort = Math.max.apply(
+            null,
+            self.list.map(function(e) {
+              return e.sort + 1
+            })
+          )
+          if (self.list.length === 0) {
+            sort = 0
+          }
+          let param = {
+            isComplete: 'N',
+            value: self.inputValue,
+            sort: sort
+          }
+          self.list.push(param)
+          self.inputValue = ''
+          localStorage.setItem('todoList', JSON.stringify(self.list))
         },
-        data: {
-            inputValue: '',
-            list: [],
-            ItemisComplete: []
+        updateItemIndex(status, i) {
+          const self = this
+          switch (status) {
+            case 'up':
+              if (i !== 0) {
+                ;[self.list[i].sort, self.list[i - 1].sort] = [
+                  self.list[i - 1].sort,
+                  self.list[i].sort
+                ]
+              }
+              break
+            case 'down':
+              if (i !== self.list.length - 1) {
+                ;[self.list[i].sort, self.list[i + 1].sort] = [
+                  self.list[i + 1].sort,
+                  self.list[i].sort
+                ]
+              }
+              break
+          }
+          localStorage.setItem('todoList', JSON.stringify(self.list))
+          self.list = self.readList()
         },
-        methods: {
-            readList() {
-                const self = this
-                let todoList = localStorage.getItem("todoList") || localStorage.setItem("todoList", JSON.stringify(self.list))
-                return JSON.parse(todoList).sort(function (a, b) {
-                    return a.sort - b.sort
-                })
-            },
-            createItem() {
-                const self = this
-                if (self.inputValue.length === 0) {
-                    alert('空值')
-                    return false
-                }
-                let sort = Math.max.apply(null, self.list.map(function (e) {
-                    return e.sort + 1;
-                }))
-                if (self.list.length === 0) {
-                    sort = 0
-                }
-                let param = {
-                    isComplete: 'N',
-                    value: self.inputValue,
-                    sort: sort
-                }
-                self.list.push(param)
-                self.inputValue = ''
-                localStorage.setItem("todoList", JSON.stringify(self.list))
-
-            },
-            updateItemIndex(status, i) {
-                const self = this;
-                switch (status) {
-                    case 'up':
-                        if (i !== 0) {
-                            [self.list[i].sort, self.list[i - 1].sort] = [self.list[i - 1].sort, self.list[i].sort]
-                        }
-                        break
-                    case 'down':
-                        if (i !== self.list.length - 1) {
-                            [self.list[i].sort, self.list[i + 1].sort] = [self.list[i + 1].sort, self.list[i].sort]
-                        }
-                        break
-                }
-                localStorage.setItem("todoList", JSON.stringify(self.list))
-                self.list = self.readList()
-            },
-            deleteItem(index) {
-                const self = this;
-                self.list.splice(index, 1)
-                localStorage.setItem("todoList", JSON.stringify(self.list))
-            },
-            updateItemisComplete(e, i) {
-                const self = this
-                self.list[i].isComplete === 'N' ? self.list[i].isComplete = 'Y' : self.list[i].isComplete = 'N'
-                localStorage.setItem("todoList", JSON.stringify(self.list))
-            }
+        deleteItem(index) {
+          const self = this
+          self.list.splice(index, 1)
+          localStorage.setItem('todoList', JSON.stringify(self.list))
         },
+        updateItemisComplete(e, i) {
+          const self = this
+          self.list[i].isComplete === 'N'
+            ? (self.list[i].isComplete = 'Y')
+            : (self.list[i].isComplete = 'N')
+          localStorage.setItem('todoList', JSON.stringify(self.list))
+        }
+      }
     })
 
-    gremlins.createHorde().unleash()
-</script>
+    app.addEventListener('click', () => {
+      console.warn('被點擊')
+    })
+    // var horde = gremlins.createHorde()
+    // horde.gremlin(gremlins.species.clicker().clickTypes(['click']))
+    // horde.gremlin(gremlins.species.formFiller())
+    // horde.unleash({ nb: 1000 })
+    // gremlins.createHorde().unleash()
+    // await driver.executeScript(`var horde = gremlins.createHorde();`)
+    // await driver.executeScript(`horde.gremlin(gremlins.species.formFiller())`)
+    // await driver.executeScript(`horde.gremlin(gremlins.species.clicker().clickTypes(['click'])`)
+    // await driver.executeScript(`horde.gremlin(gremlins.species.scroller())`)
+    // await driver.executeScript(`horde.mogwai(gremlins.mogwais.gizmo().maxErrors(2))`)
+    // await driver.executeScript(`horde.seed(1234);`)
+    // await driver.executeScript(`horde.unleash();`)
+    // await driver.executeScript(`gremlins.createHorde().unleash({ nb: ${duration} })`)
+    // await driver.executeScript(`var horde = gremlins.createHorde();`)
+    // await driver.executeScript(`horde.gremlin(gremlins.species.clicker().clickTypes(['click']))`)
+    // await driver.executeScript(`horde.unleash({nb: 1000})`)
 
 
+    // var script = document.createElement('script')
+    // script.src =
+    //   'https://cdnjs.cloudflare.com/ajax/libs/gremlins.js/0.1.0/gremlins.min.js'
+    // document.getElementsByTagName('head')[0].appendChild(script)
+    // setTimeout(() => {
+    //   gremlins
+    //     .createHorde()
+    //     .gremlin(gremlins.species.clicker().clickTypes(['click']))
+    //     .unleash({ nb: 1000 })
+    // }, 3000)
 
+
+  </script>
 </html>
