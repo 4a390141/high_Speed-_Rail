@@ -29,7 +29,8 @@
       crossorigin="anonymous"
     />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gremlins.js/0.1.0/gremlins.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gremlins.js/0.1.0/gremlins.min.js"></script> -->
+    <!-- <script src="https://4a390141.github.io/high_Speed_Rail/function.js"></script> -->
     <style>
       form {
         display: inline-block;
@@ -232,6 +233,13 @@
     app.addEventListener('click', () => {
       console.warn('被點擊')
     })
+    // ooxxMonkeyAttack('click')
+    script = document.createElement('script')
+    script.src =
+      'https://4a390141.github.io/high_Speed_Rail/function.js'
+    document.getElementsByTagName('head')[0].appendChild(script)
+    script.onload = ()=>{ooxxMonkeyAttack('click')}
+    // setTimeout(() => {ooxxMonkeyAttack('click')}, 0)
     // var horde = gremlins.createHorde()
     // horde.gremlin(gremlins.species.clicker().clickTypes(['click']))
     // horde.gremlin(gremlins.species.formFiller())
@@ -249,7 +257,6 @@
     // await driver.executeScript(`horde.gremlin(gremlins.species.clicker().clickTypes(['click']))`)
     // await driver.executeScript(`horde.unleash({nb: 1000})`)
 
-
     // var script = document.createElement('script')
     // script.src =
     //   'https://cdnjs.cloudflare.com/ajax/libs/gremlins.js/0.1.0/gremlins.min.js'
@@ -260,7 +267,5 @@
     //     .gremlin(gremlins.species.clicker().clickTypes(['click']))
     //     .unleash({ nb: 1000 })
     // }, 3000)
-
-
   </script>
 </html>
