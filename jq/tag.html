@@ -68,11 +68,23 @@
             <li> link b</li>
             <li> link c</li>
         </ul>
-        <div class="content">a</div>
+        <div class="content">a
+            <div>
+                <button id="ooxx">點我</button>
+            </div>
+        </div>
         <div class="content">b</div>
         <div class="content">c</div>
     </div>
 
+    <script>
+
+        function kkk(param) { 
+            console.log(param.data)
+         }
+        $('.wrap').on('click','#ooxx','ooxx',kkk)
+    </script>
+    
 </body>
 
 </html>
