@@ -69,8 +69,10 @@
             <li> link c</li>
         </ul>
         <div class="content">a
-            <div>
+            <div id="hhh">
                 <button id="ooxx">點我</button>
+                <button id="xx">消失</button>
+                <button id="oo">增加</button>
             </div>
         </div>
         <div class="content">b</div>
@@ -78,11 +80,34 @@
     </div>
 
     <script>
-
+        $('#xx').hide()
+        function jjj(param) { 
+            console.log('jjj',param)
+         }
         function kkk(param) { 
-            console.log(param.data)
+            console.log('kkk',param.data)
+            $('#xx').show(1000,jjj('xx'))
          }
         $('.wrap').on('click','#ooxx','ooxx',kkk)
+
+
+
+
+
+
+         function showId(even){
+             console.log('id',even.data)
+         }
+         function createTemplate(){
+             let id = 'ddd'
+            let template = `<div id="${id}">
+                                <button class="ttt">ttt</button>
+                            </div>`
+            $('#hhh').append(template)
+            $('.wrap').on('click','.ttt',id,showId)
+         }
+         createTemplate()
+        // $('.wrap').on('click','#oo',ooo)
     </script>
     
 </body>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let param = {
+            CarNo: "置物-陳輝",
+            ContactTel1: "28577229",
+            DepName: "(002)承暉",
+            EDate: "08 31 2010 12:00AM",
+            Master: "林冠吟1",
+            RentID: "000000000015",
+            UnionCode: "",
+            contactID: "DCDCFE33-ED9A-4CAF-9B2B-854D43A72B79"
+        }
+        let paramKeyArray = Object.keys(param)
+        let carno = paramKeyArray.find(element=>{
+            return element.match(/carno/gi)
+        })
+        let depname = paramKeyArray.find(element=>{
+            return element.match(/depname/gi)
+        })
+        let contactId = paramKeyArray.find(element=>{
+            return element.match(/contactId/gi)
+        })
+        console.log('carno',param[carno])
+        console.log('carno',param[depname])
+        console.log('carno',param[contactId])
+        function ooxx(param){
+            console.log(param)
+        }
+    </script>
+</body>
+</html>
