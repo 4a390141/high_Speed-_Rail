@@ -18,21 +18,164 @@
     </style>
   </head>
   <body>
-        <input type="text" id="demo" />
-        <div id="xxx">{{name}}</div>
-  
-        <script>
-          const obj = {}
-          Object.   (obj, 'name', {
-            set: function(value) {
-              document.getElementById('xxx').innerHTML = value
-              document.getElementById('demo').value = value
-            }
-          })
-          document.querySelector('#demo').oninput = function(e) {
-            obj.name = e.target.value;
+    <input type="text" id="demo" />
+    <div id="xxx">{{ name }}</div>
+
+    <script>
+              const obj = {}
+              Object.   (obj, 'name', {
+                set: function(value) {
+                  document.getElementById('xxx').innerHTML = value
+                  document.getElementById('demo').value = value
+                }
+              })
+              document.querySelector('#demo').oninput = function(e) {
+                obj.name = e.target.value;
+              }
+              obj.name = ''
+
+
+
+              beforeMount(){
+        const self = this
+        // 判斷是否為自己的暫存單
+        if (self.ticketInfo) {
+          logger.info(`#${self.ticketInfo.ticketid}(暫存單) 資料為`, self.ticketInfo)
+          if (self.ticketInfo.ticketownerid !== sessionStore.read('UserID_g')) {
+            // 不屬於自己的暫存單
+            self.ticketTempOwnerStatus = false
+            logger.warn(`#${self.ticketInfo.ticketid} 不屬於自己的暫存單`)
+            toastr.error(t('HelpDeskNew.notYourOwnTicketTemp'))
+          } else {
+            self.ticketTempOwnerStatus = true
           }
-          obj.name = ''
-        </script>
+        }
+      },
+
+      count: 0,
+          times: [],
+          fps: 60
+
+
+      timeWalking() {
+          const self = this
+          if (self.columnsData != null && self.columnsData !== '') {
+            let tempCurrentTime = parseInt(self.longestTime, 10)
+            tempCurrentTime += 1000
+            self.longestTime = tempCurrentTime
+          }
+        },
+        // 計時器啟動
+        timerTrigger() {
+          const self = this
+          requestAnimationFrame(self.timer)
+        },
+        // 計時器
+        timer() {
+          const self = this
+          self.count++
+          if (self.count >= self.fps) {
+            self.timeWalking()
+            self.count = 0
+          }
+          requestAnimationFrame(self.timer)
+        },
+        // 取得 FPS
+        getFPS() {
+          let self = this
+          requestAnimationFrame(() => {
+            const now = performance.now()
+            while (self.times.length > 0 && self.times[0] <= now - 1000) {
+              self.times.shift()
+            }
+            self.times.push(now)
+            self.fps = self.times.length
+            self.getFPS()
+          })
+        }
+    </script>
+    <!-- 
+
+BulletinByPerson
+          時間內啟用的 若設定無也會顯示
+
+ReservationData
+
+iboxShow
+
+         -->
+    <button class="btn btn-primary btn-outline" data-dismiss="modal">
+      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span
+      ><span data-i18n="TMAgentDashboard.CloseWindow">關閉視窗</span>
+    </button>
+
+    <table class="table table-bordered">
+      <tbody>
+        <tr>
+          <td style="width: 100px;background-color: #EEE;">
+            <strong data-i18n="TMAgentDashboard.StartDate">開始日期</strong>
+          </td>
+
+          <td style="width: 300px;"><span id="myCreateDay"></span></td>
+          <td style=" width:  100px;background-color: #EEE;">
+            <strong data-i18n="TMAgentDashboard.EndDate">結束日期</strong>
+          </td>
+          <td style=" width:  300px;"><span id="myExpirationDay"></span></td>
+        </tr>
+        <tr>
+          <td colspan="4" style="word-break: break-all;">
+            <span id="mycontent"
+              ><p>
+                111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+              </p></span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 公佈欄modal -->
+    <infobase-modal :is-active="bulletinModal.active">
+      <template slot="header">
+        <button
+          type="button"
+          class="close"
+          aria-hidden="true"
+          @click="bulletinModal.active=false"
+        >
+          ×
+        </button>
+        <h4 class="modal-title">內部交談</h4>
+      </template>
+      <template slot="body">
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <td style="background-color:#EEE;">
+                <strong>{{ t('ReportCommon.startDate') }}</strong>
+              </td>
+              <td>{{ bulletinModal.modalData['StartTime'] || '' }}</td>
+              <td style="background-color: #EEE;">
+                <strong>{{ t('ReportCommon.endDate') }}</strong>
+              </td>
+              <td>{{ bulletinModal.modalData['EndTime'] || '' }}</td>
+            </tr>
+            <tr>
+              <td
+                colspan="4"
+                style="word-break: break-all;"
+                v-html="bulletinModal.modalData['Content']"
+              ></td>
+            </tr>
+          </tbody>
+        </table>
+      </template>
+      <template slot="modal-footer">
+        <button class="btn btn-primary btn-outline">
+          <span class="glyphicon glyphicon-remove" aria-hidden="true"></span
+          ><span>{{ t('TMAgentDashboard.CloseWindow') }}</span>
+        </button>
+      </template>
+    </infobase-modal>
   </body>
 </html>

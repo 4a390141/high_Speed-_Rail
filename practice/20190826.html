@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form
+      class="createTicketForm"
+      @submit.stop.prevent="()=>false"
+      v-if="ticketTempOwnerStatus"
+    >
+      <div class="form-group" :class="colSm">
+        <label for="parentClass" class="col-sm-3 control-label labelcenter">{{
+          t('HelpDeskNew.parentClass')
+        }}</label>
+        <div class="col-sm-9">
+          <select
+            name="parentClass"
+            class="form-control "
+            v-model="parentTicketCategoryID"
+          >
+            <option
+              v-for="item in parentTicketCategoryList"
+              :value="item.dbid"
+              >{{ item.name }}</option
+            >
+          </select>
+        </div>
+      </div>
+      <div class="form-group" :class="colSm">
+        <label for="childClass" class="col-sm-3 control-label labelcenter">{{
+          t('HelpDeskNew.kidClass')
+        }}</label>
+        <div class="col-sm-9">
+          <select
+            name="ticketCategoryID"
+            class="form-control"
+            v-model="childTicketCategoryID"
+          >
+            <option v-if="childTicketCategoryList.length===0" value="-1">{{
+              t('HelpDeskNew.noSubcategories')
+            }}</option>
+            <option
+              v-for="item in childTicketCategoryList"
+              :value="item.dbid"
+              >{{ item.name }}</option
+            >
+          </select>
+        </div>
+      </div>
+      <infobase-person-multiselect
+        :class="colSm"
+        :label="(t('component.AssignPerson'))"
+        :placeholder="(t('component.KeyAssignPerson'))"
+        label-col="3"
+        :tenant-i-d="tenantID"
+        v-model="targetID"
+        :multiple="false"
+      >
+        <slot></slot>
+      </infobase-person-multiselect>
+      <infobase-datetimepicker
+        class="form-group"
+        :class="colSm"
+        label-col="3"
+        :label="t('HelpDeskNew.deadline')"
+        :value.sync="endTime"
+      ></infobase-datetimepicker>
+      <div class="form-group" :class="colSm">
+        <label for="priorityID" class="col-sm-3 control-label labelcenter">{{
+          t('HelpDeskNew.importantLevel')
+        }}</label>
+        <div class="col-sm-9">
+          <select
+            name="priorityID"
+            class="form-control"
+            required="required"
+            v-model="priorityID"
+          >
+            <option value="0">{{ t('HelpDeskNew.selectImportantLv') }}</option>
+            <option v-for="item in priorityList" :value="item.dbid">{{
+              item.name
+            }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" :class="colSm">
+        <label for="memo" class="col-sm-3 control-label labelcenter">{{
+          t('HelpDeskNew.Remark')
+        }}</label>
+        <div class="col-sm-9">
+          <input
+            type="text"
+            name="memo"
+            v-model="memo"
+            :placeholder="(t('HelpDeskNew.enterComment'))"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="form-group" :class="colSm">
+        <label class="col-sm-3 control-label labelcenter">{{
+          t('HelpDeskNew.caseStatus')
+        }}</label>
+        <div class="col-sm-9">
+          <label class="label label-danger labelfont" v-if="ticketInfo">{{
+            t('HelpDeskNew.temporaryDeposit')
+          }}</label>
+          <label class="label label-danger labelfont" v-else>{{
+            t('HelpDeskNew.notYetOpen')
+          }}</label>
+        </div>
+      </div>
+      <div class="form-group col-sm-12">
+        <label
+          for="subject"
+          class="control-label labelcenter"
+          :class="colinnerSmLabel"
+          >{{ t('HelpDeskNew.CaseTheme') }}</label
+        >
+        <div :class="colinnerSmDiv">
+          <input
+            type="text"
+            name="subject"
+            v-model.trim="subject"
+            :placeholder="t('HelpDeskNew.enterCaseTheme')"
+            required="required"
+            class="form-control"
+          />
+        </div>
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label class="control-label labelcenter" :class="colinnerSmLabel">{{
+          t('HelpDeskNew.caseOverview')
+        }}</label>
+        <div :class="colinnerSmDiv">
+          <infobase-ckeditor
+            :unique-name="produceUniqueName()"
+            v-model="content"
+            :editor-height="100"
+          ></infobase-ckeditor>
+          <!--<textarea name="content" v-model="content" rows="3" :placeholder=" t('HelpDeskNew.enterCaseSummary') " class="form-control" required="required"></textarea>-->
+        </div>
+      </div>
+      <div class="form-group" :class="colSm" style="text-align: center;">
+        <div class="checkbox checkbox-inline">
+          <input
+            type="checkbox"
+            name="alertFlag"
+            v-model="alertFlag"
+            :true-value="'Y'"
+            :false-value="'N'"
+          />
+          <label
+            class="checkbox-lable unSelectable"
+            @click="alertFlag=(alertFlag=='Y'?'N':'Y')"
+            >{{ t('HelpDeskNew.emailNotificationPersonnel') }}</label
+          >
+        </div>
+      </div>
+      <div class="row"></div>
+      <div class="row">
+        <div class="form-group col-sm-12">
+          <label class="control-label labelcenter col-sm-1">{{
+            t('WatchTeamSettingNew.Watcher')
+          }}</label>
+          <div class="col-sm-11">
+            <button
+              v-for="item in watcherArray"
+              class="btn btn-outline btn-default btn-sm m-r-xs m-b-xs"
+              :key="item.PersonID"
+            >
+              <span>{{ item.email }}</span>
+              <i class="fas fa-times" @click="removeWatcher(item.PersonID)"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <file-selector
+          :file-list.sync="attachDataList"
+          :description="'('+t('HelpDeskNew.singleCap')+(uploadSizeLimit/(1024*1024)).toFixed(0)+'MB)'"
+        ></file-selector>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-12">
+          <div v-for="(file,index) in tempAttachDataList">
+            <i class="fas fa-paperclip text-muted"></i>
+            <span v-text="decodeURIString(file.name)"></span>
+            <i
+              class="far fa-trash-alt text-muted"
+              @click="removeTempAttachDataList(file,index)"
+            ></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-12">
+        <infobase-button
+          class="btn-default pull-right"
+          :btnword="t('common.cancel')"
+          icon="glyphicon glyphicon-remove"
+          @click="hide"
+        ></infobase-button>
+        <infobase-button
+          class="btn-default pull-right m-r-xs"
+          :btnword="t('common.delete')"
+          icon="glyphicon glyphicon-trash"
+          @click="deleteTemp"
+          v-if="ticketInfo"
+        ></infobase-button>
+        <infobase-button
+          class="btn-warning pull-right m-r-xs"
+          :btnword="t('HelpDeskNew.temporaryStorage')"
+          icon="glyphicon glyphicon-floppy-disk"
+          @click="saveTemp"
+          :disabled="isDisabled"
+        ></infobase-button>
+        <infobase-button
+          class="btn-primary pull-right m-r-xs"
+          :btnword="t('common.send')"
+          icon="glyphicon glyphicon-send"
+          @click="send"
+          :disabled="isDisabled"
+        ></infobase-button>
+        <infobase-button
+          class="btn-primary pull-right m-r-xs"
+          :btnword="t('WatchTeamSettingNew.Watcher')"
+          icon="fas fa-user-plus"
+          @click="AddWatcherModal.active=true"
+          :disabled="isDisabled"
+        ></infobase-button>
+      </div>
+
+      <!-- 監看者燈箱 -->
+      <infobase-modal :is-active="AddWatcherModal.active">
+        <template slot="header">
+          <button
+            type="button"
+            class="close"
+            aria-hidden="true"
+            @click="AddWatcherModal.active= false"
+          >
+            ×
+          </button>
+          <h4 class="modal-title">
+            {{ t('WatchTeamSettingNew.CreateWatcher') }}
+          </h4>
+        </template>
+        <div slot="body" class="row ticketWatcherModalList">
+          <multiselect
+            class="col-sm-12"
+            v-model="TicketWatcherModal.value"
+            :tag-placeholder="t('HelpDeskNew.addAfterEnter')"
+            selectLabel=""
+            :deselectLabel="t('HelpDeskNew.clickRemove')"
+            :placeholder="t('HelpDeskNew.enterEmail')"
+            label="name"
+            track-by="code"
+            :options="TicketWatcherModal.options"
+            :multiple="true"
+            :taggable="true"
+            @tag="addTag"
+          >
+          </multiselect>
+        </div>
+        <template slot="body_btn">
+          <infobase-button
+            class="btn-primary"
+            icon="fas fa-check"
+            :icon-with-i="true"
+            :btnword="(t('common.add'))"
+            @click="AddWatcherModalSubmit"
+          >
+          </infobase-button>
+          <infobase-button
+            class="btn-default"
+            icon="fas fa-times"
+            :icon-with-i="true"
+            :btnword="(t('common.cancel'))"
+            @click="AddWatcherModal.active=false"
+          >
+          </infobase-button>
+        </template>
+      </infobase-modal>
+    </form>
+
+    <script>
+      Vue.component('info360-create-ticket', {
+        template: `<div>
+                <div class="row scroller createTicket" style="position: relative">
+                    <form class="createTicketForm" @submit.stop.prevent="()=>false" v-if="ticketTempOwnerStatus">
+                        <div class="form-group" :class="colSm">
+                            <label for="parentClass" class="col-sm-3 control-label labelcenter">{{ t('HelpDeskNew.parentClass') }}</label>
+                            <div class="col-sm-9">
+                                <select name="parentClass" class="form-control " v-model="parentTicketCategoryID">
+                                    <option v-for="item in parentTicketCategoryList" :value="item.dbid">{{item.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" :class="colSm">
+                            <label for="childClass" class="col-sm-3 control-label labelcenter">{{ t('HelpDeskNew.kidClass') }}</label>
+                            <div class="col-sm-9">
+                                <select name="ticketCategoryID" class="form-control" v-model="childTicketCategoryID">
+                                    <option v-if="childTicketCategoryList.length===0" value="-1">{{ t('HelpDeskNew.noSubcategories') }}</option>
+                                    <option v-for="item in childTicketCategoryList" :value="item.dbid">{{item.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <infobase-person-multiselect :class="colSm" :label="(t('component.AssignPerson'))" :placeholder="(t('component.KeyAssignPerson'))" label-col="3" :tenant-i-d="tenantID"
+                                        v-model="targetID" :multiple="false">
+                            <slot></slot>
+                        </infobase-person-multiselect>
+                         <infobase-datetimepicker class="form-group" :class="colSm" label-col="3" :label="t('HelpDeskNew.deadline')"  :value.sync="endTime"></infobase-datetimepicker>
+                        <div class="form-group" :class="colSm">
+                            <label for="priorityID" class="col-sm-3 control-label labelcenter">{{ t('HelpDeskNew.importantLevel') }}</label>
+                            <div class="col-sm-9">
+                                <select name="priorityID" class="form-control" required="required" v-model="priorityID">
+                                    <option value="0">{{ t('HelpDeskNew.selectImportantLv') }}</option>
+                                    <option v-for="item in priorityList" :value="item.dbid">{{item.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" :class="colSm">
+                            <label for="memo" class="col-sm-3 control-label labelcenter">{{ t('HelpDeskNew.Remark') }}</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="memo" v-model="memo" :placeholder="(t('HelpDeskNew.enterComment'))" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group" :class="colSm">
+                            <label class="col-sm-3 control-label labelcenter">{{ t('HelpDeskNew.caseStatus') }}</label>
+                            <div class="col-sm-9">
+                                <label class="label label-danger labelfont" v-if="ticketInfo">{{ t('HelpDeskNew.temporaryDeposit') }}</label>
+                                <label class="label label-danger labelfont" v-else>{{ t('HelpDeskNew.notYetOpen') }}</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12">
+                            <label for="subject" class="control-label labelcenter" :class="colinnerSmLabel">{{ t('HelpDeskNew.CaseTheme') }}</label>
+                            <div :class="colinnerSmDiv">
+                                <input type="text" name="subject" v-model.trim="subject" :placeholder="t('HelpDeskNew.enterCaseTheme')" required="required" class="form-control">
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        <!--  長出自定義欄位 -->
+                <div class="form-group" v-for="(ColType , index )  in ticketTemplateColTypeList" :key="ColType.TicketColTitleID" :class="{'row':(index+1)%3 == 0}">
+                      <div class="form-group col-sm-4" >
+                          <label  for="subject" class="col-sm-3 control-label labelcenter">{{ColType.Title}}</label>
+                          
+                          <div class="col-sm-9">
+                              <select v-if="ColType.TitleType==='select'" name="priorityID" class="form-control" v-model="ticketTemplateValueList[index]" required="required">
+                                <option value="" selected>{{  t('HelpDeskNew.PleaseSelect') }}</option>
+                                <option v-for="colItem in ticketTemplateColTypeList[index].ColItems" :value="colItem.ColItemID">{{ colItem.Item }}</option>                                 
+                             </select>
+                             
+                             <div v-else-if="ColType.TitleType === 'selectlist'" >
+                                     <multiselect v-model="ticketTemplateValueList[index]" selectLabel="" 
+                                                 :deselectLabel="(t('c_info360_mixSearch.input_remove'))" 
+                                                 :placeholder="(t('c_info360_mixSearch.input_search'))" label="name"
+                                                 track-by="code" :options="ticketMultiSelect(ColType)"
+                                                 :multiple="true" :taggable="false">
+                                             <span slot="noResult">{{t('c_info360_mixSearch.none')}}</span>
+                                     </multiselect>   
+                             </div>
+                             
+                            <div v-else-if="ColType.TitleType === 'radio'">
+                                  <div v-for="colItem in ticketTemplateColTypeList[index].ColItems">
+                                      <div class="radio">
+                                        <input type="radio" :value="colItem.ColItemID" v-model="ticketTemplateValueList[index]">
+                                        <label @click="radioValue(colItem.ColItemID,index)">{{colItem.Item}}</label>
+                                      </div>    
+                                  </div>
+                             </div>
+                             
+                              <div v-else-if="ColType.TitleType === 'checkbox'">
+                                  <div v-for="colItem in ticketTemplateColTypeList[index].ColItems">
+                                      <div class="checkbox">
+                                        <input type="checkbox" :value="colItem.ColItemID" v-model="ticketTemplateValueList[index]">
+                                        <label @click="checkboxValue(colItem.ColItemID,index)">{{colItem.Item}}</label>
+                                      </div>
+                                  </div>
+                              </div>   
+                                                 
+                             <input v-else-if="ColType.TitleType==='input'" type="text"  name="subject"  class="form-control" v-model="ticketTemplateValueList[index]">
+                             <textarea v-else-if="ColType.TitleType==='textarea'" name="subject" class="form-control"  v-model="ticketTemplateValueList[index]"></textarea>
+                             
+                             <infobase-datetimepicker v-else-if="ColType.TitleType==='timeHm'" format="HH:mm:ss" :value.sync="ticketTemplateValueList[index]"></infobase-datetimepicker>
+                             <infobase-datetimepicker v-else-if="ColType.TitleType==='timeYMDHm'" format="YYYY-MM-DD HH:mm:ss" :value.sync="ticketTemplateValueList[index]"></infobase-datetimepicker>
+                             <infobase-datetimepicker v-else-if="ColType.TitleType==='timeYMD'" format="YYYY-MM-DD" :value.sync="ticketTemplateValueList[index]"></infobase-datetimepicker>      
+                          </div>
+                     </div>
+                   </div>
+                         
+                         
+                         
+                         
+                        <div class="form-group col-sm-12">
+                            <label class="control-label labelcenter" :class="colinnerSmLabel">{{ t('HelpDeskNew.caseOverview') }}</label>
+                            <div :class="colinnerSmDiv">
+                                <infobase-ckeditor :unique-name="produceUniqueName()" v-model="content" :editor-height="100"></infobase-ckeditor>
+                                <!--<textarea name="content" v-model="content" rows="3" :placeholder=" t('HelpDeskNew.enterCaseSummary') " class="form-control" required="required"></textarea>-->
+                            </div>
+                        </div>
+                        <div class="form-group" :class="colSm" style="text-align: center;">
+                            <div class="checkbox checkbox-inline">
+                                <input type="checkbox" name="alertFlag"   v-model="alertFlag" :true-value="'Y'" :false-value="'N'">
+                                <label class="checkbox-lable unSelectable" @click="alertFlag=(alertFlag=='Y'?'N':'Y')">{{ t('HelpDeskNew.emailNotificationPersonnel') }}</label>
+                            </div>
+                        </div>
+                        <div class="row"></div>
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                <label class="control-label labelcenter col-sm-1">{{ t('WatchTeamSettingNew.Watcher') }}</label>
+                                <div class="col-sm-11">
+                                  <button v-for="item in watcherArray" class="btn btn-outline btn-default btn-sm m-r-xs m-b-xs" :key="item.PersonID">
+                                    <span>{{ item.email }}</span>
+                                    <i class="fas fa-times" @click="removeWatcher(item.PersonID)"></i>
+                                  </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <file-selector :file-list.sync="attachDataList"  :description="'('+t('HelpDeskNew.singleCap')+(uploadSizeLimit/(1024*1024)).toFixed(0)+'MB)'"></file-selector>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                <div v-for="(file,index) in tempAttachDataList">
+                                    <i class="fas fa-paperclip text-muted"></i>
+                                    <span v-text="decodeURIString(file.name)"></span>
+                                    <i class="far fa-trash-alt text-muted" @click="removeTempAttachDataList(file,index)"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!--自定義按鈕 -->
+                        <div class="col-sm-12">
+                             <div v-for="btn in customizeBtnArray">
+                               <infobase-button v-if="btn.TitleType === 'postbutton'" class="btn-primary pull-right m-r-xs" :btnword="btn.Title" icon="glyphicon glyphicon-send"
+                                  @click="send" :disabled="isDisabled"
+                               ></infobase-button>
+                               <infobase-button v-if="false" v-else-if="btn.TitleType === 'divbutton'" class="btn-primary pull-right m-r-xs" :btnword="btn.Title" icon="fas fa-external-link-alt"
+                                  @click="$emit('open-div-ticket','特力')" :disabled="isDisabled"
+                               ></infobase-button>                         
+                             </div>
+                        </div>
+                        
+                        <div class="col-sm-12">
+                            <infobase-button class="btn-default pull-right" :btnword="t('common.cancel')" icon="glyphicon glyphicon-remove"
+                                             @click="hide"
+                             ></infobase-button>
+                            <infobase-button class="btn-default pull-right m-r-xs" :btnword="t('common.delete')" icon="glyphicon glyphicon-trash"
+                                             @click="deleteTemp" v-if="ticketInfo"
+                             ></infobase-button>
+                            <infobase-button class="btn-warning pull-right m-r-xs" :btnword="t('HelpDeskNew.temporaryStorage')" icon="glyphicon glyphicon-floppy-disk"
+                                             @click="saveTemp" :disabled="isDisabled"
+                             ></infobase-button>
+                            <infobase-button class="btn-primary pull-right m-r-xs" :btnword="t('common.send')" icon="glyphicon glyphicon-send"
+                                             @click="send" :disabled="isDisabled"
+                             ></infobase-button>
+                            <infobase-button class="btn-primary pull-right m-r-xs" :btnword="t('WatchTeamSettingNew.Watcher')" icon="fas fa-user-plus"
+                                             @click="AddWatcherModal.active=true" :disabled="isDisabled"
+                             ></infobase-button>
+                        </div>
+                        
+                        <!-- 監看者燈箱 -->
+                        <infobase-modal :is-active="AddWatcherModal.active">
+                            <template slot="header">
+                                <button type="button" class="close" aria-hidden="true" @click="AddWatcherModal.active= false">×</button>
+                                <h4 class="modal-title">{{ t('WatchTeamSettingNew.CreateWatcher') }}</h4>
+                            </template>
+                            <div slot="body" class="row ticketWatcherModalList">
+                                <multiselect class="col-sm-12" v-model="TicketWatcherModal.value" :tag-placeholder="t('HelpDeskNew.addAfterEnter')" selectLabel=""
+                                                 :deselectLabel="t('HelpDeskNew.clickRemove')" :placeholder="t('HelpDeskNew.enterEmail')" label="name"
+                                                 track-by="code" :options="TicketWatcherModal.options" :multiple="true"
+                                                 :taggable="true" @tag="addTag">                                           
+                                </multiselect>                           
+                            </div>
+                            <template slot="body_btn">
+                                <infobase-button class="btn-primary" icon="fas fa-check" :icon-with-i="true" :btnword="(t('common.add'))" @click="AddWatcherModalSubmit">
+                                </infobase-button>
+                                <infobase-button class="btn-default" icon="fas fa-times" :icon-with-i="true" :btnword="(t('common.cancel'))" @click="AddWatcherModal.active=false">
+                                </infobase-button>
+                            </template>
+                        </infobase-modal>
+                    </form>
+                    <infobase-button class="btn-default pull-right" :btnword="t('common.cancel')" icon="glyphicon glyphicon-remove"
+                        @click="hide" v-if="!ticketTempOwnerStatus" style="position: absolute;bottom: 0px;right: 15px;"
+                    ></infobase-button>
+                </div>
+          </div>`,
+        props: {
+          tenantID: { required: true },
+          contactID: { required: false },
+          roomID: { required: false },
+          showDetail: { required: true },
+          customerData: { required: false },
+          rowInputCount: { default: '2' },
+          uploadSizeLimit: { default: 2097152 },
+          ticketInfo: {},
+          refresh: { default: true },
+          ixnID: {},
+          ixnDBID: {},
+          formData: { type: Object, default: null },
+          ticketTemplateID: {
+            type: Number,
+            default: '0'
+          },
+          typeID: { required: true, type: Number }
+        },
+        data: function() {
+          return {
+            UserID: parseInt(sessionStore.read('UserID_g'), 10),
+            isLodding: false,
+            comment: '',
+            targetID: '',
+            priorityList: [],
+            priorityID: parseInt(
+              sessionStore.read('config_hd_defaultPriority_g'),
+              10
+            ),
+            TicketCategory: [],
+            parentTicketCategoryID: -1,
+            childTicketCategoryID: -1,
+            endTime: '',
+            attachDataList: [],
+            tempAttachDataList: [],
+            content: '',
+            subject: '',
+            memo: '',
+            alertFlag: 'N',
+            colinnerSmLabel: 'col-sm-2',
+            colinnerSmDiv: 'col-sm-10',
+            ticketTemplateColTypeList: [],
+            ticketTemplateValueList: [],
+            ticketTemplateColDataList: [],
+            isDisabled: false,
+            watcherArray: [],
+            originWatcherArray: [],
+            TicketWatcherModal: {
+              value: [],
+              options: []
+            },
+            AddWatcherModal: {
+              active: false
+            },
+            ticketTempOwnerStatus: true,
+            customizeBtnArray: []
+          }
+        },
+        computed: {
+          parentTicketCategoryList: {
+            get() {
+              let self = this
+
+              return self.TicketCategory.filter(
+                (item, index, array) => parseInt(item.parentid, 10) === 0
+              )
+            },
+            set() {
+              let self = this
+              return self.TicketCategory.filter(
+                (item, index, array) => parseInt(item.parentid, 10) === 0
+              )
+            }
+          },
+          childTicketCategoryList: {
+            get() {
+              let self = this
+              let selectedPid = self.parentTicketCategoryID
+
+              return self.TicketCategory.filter(
+                item =>
+                  parseInt(item.parentid, 10) === parseInt(selectedPid, 10)
+              )
+            },
+            set() {
+              let self = this
+              let selectedPid = self.parentTicketCategoryID
+              return self.TicketCategory.filter(
+                item =>
+                  parseInt(item.parentid, 10) === parseInt(selectedPid, 10)
+              )
+            }
+          },
+          userData: {
+            get: function() {
+              let self = this
+              if (self.$store) {
+                return self.$store.getters.getChatRooms({ roomID: self.roomID })
+              } else if (self.customerData) {
+                return { contactdata: self.customerData }
+              } else {
+                return { contactdata: {} }
+              }
+            },
+            set: function(val) {
+              let self = this
+              return self.$store.getters.getChatRooms({ roomID: self.roomID })
+            }
+          },
+          colSm: function() {
+            let vm = this
+            let rowInputCount = parseInt(vm.rowInputCount, 10)
+            let colSmNum = 12 / rowInputCount
+            if (rowInputCount === 2) {
+              vm.colinnerSmLabel = 'col-sm-2'
+              vm.colinnerSmDiv = 'col-sm-10'
+            } else if (rowInputCount === 3) {
+              vm.colinnerSmLabel = 'col-sm-1'
+              vm.colinnerSmDiv = 'col-sm-11'
+            }
+            return 'col-sm-' + colSmNum
+          }
+        },
+        watch: {
+          childTicketCategoryID: {
+            handler(val) {
+              // console.log('childTicketCategoryID', val)
+            }
+          },
+          refresh: function() {
+            this.initContext()
+          },
+          parentTicketCategoryID(newVal, oldVal) {
+            let self = this
+            if (self.childTicketCategoryList[0]) {
+              self.childTicketCategoryID = self.childTicketCategoryList[0].dbid
+            } else {
+              self.childTicketCategoryID = -1
+            }
+          },
+          ticketInfo: {
+            immediate: true,
+            handler(val, oldVal) {
+              let vm = this
+              let tempTicketTemplateDataList = []
+              if (val) {
+                vm.parentTicketCategoryID = val.ticketcategoryparentid
+                  ? val.ticketcategoryparentid
+                  : -1
+                vm.childTicketCategoryID = val.ticketcategoryid
+                  ? val.ticketcategoryid
+                  : -1
+                vm.targetID = val.topersonid ? val.topersonid : ''
+                vm.endTime = val.ticketendtime ? val.ticketendtime : ''
+                vm.priorityID = val.ticketpriorityid ? val.ticketpriorityid : 0
+                vm.memo = val.ticketmemo ? val.ticketmemo : ''
+                vm.subject = val.ticketsubject ? val.ticketsubject : ''
+                vm.content = val.ticketcontent ? val.ticketcontent : ''
+                vm.tempAttachDataList = []
+                vm.ticketTemplateID = val.tickettemplateid
+                  ? val.tickettemplateid
+                  : 0
+                vm.tenantID = val.tenantid ? val.tenantid : 0
+
+                //如果是系統改為指向自己
+                val.topersonid === 'SYSTEM'
+                  ? (vm.targetID = sessionStore.read('UserID_g'))
+                  : (vm.targetID = val.topersonid)
+
+                vm.reloadTicketTemplatInfo().then(() => {
+                  APIManager.get('TicketSubitems')
+                    .by({
+                      tenantID: vm.tenantID,
+                      entityTypeID: 11,
+                      ticketID: val.ticketid
+                    })
+                    .then(function(ticketSubitemObj) {
+                      ticketSubitemObj = ObjectKeysToLowerCase(ticketSubitemObj)
+                      if (ticketSubitemObj.subitems[0]) {
+                        ticketSubitemObj.subitems[0].attachdatasorce.forEach(
+                          function(item, index, array) {
+                            let temp = {
+                              name: item.displayname,
+                              src: item.attachdatasorce
+                            }
+                            vm.tempAttachDataList.push(temp)
+                          }
+                        )
+                        ticketSubitemObj.subitems[0].coldatas.forEach(function(
+                          item,
+                          index,
+                          array
+                        ) {
+                          let temp = {
+                            ColTicketID: item.ticketcolid,
+                            ColItemID: item.itemid,
+                            ColValue: item.value ? item.value : ''
+                          }
+                          tempTicketTemplateDataList.push(temp)
+                        })
+
+                        let tempTicketTemplateValueList = []
+                        vm.ticketTemplateColTypeList.forEach(function(ColItem) {
+                          tempTicketTemplateDataList.forEach(function(
+                            tempItem,
+                            index,
+                            array
+                          ) {
+                            if (
+                              ColItem.TicketColTitleID === tempItem.ColTicketID
+                            ) {
+                              if (ColItem.TitleType == 'selectlist') {
+                                let param = []
+
+                                let newName = tempItem.ColValue.split(',')
+                                let newCode = tempItem.ColItemID.split(',')
+
+                                newName.forEach(function(item, index) {
+                                  let selectListValue = {
+                                    name: item[index] ? item[index] : item,
+                                    code: newCode[index]
+                                  }
+                                  param.push(selectListValue)
+                                })
+                                // if(JSON.stringify(selectListValue)==="{}"){}
+                                tempTicketTemplateValueList.push(param)
+                              } else if (ColItem.TitleType == 'checkbox') {
+                                let param = tempItem.ColItemID.split(',')
+                                // let checkboxVal =
+                                // param.push(checkboxVal)
+                                tempTicketTemplateValueList.push(param)
+                              } else if (
+                                ColItem.TitleType == 'radio' ||
+                                ColItem.TitleType == 'select'
+                              ) {
+                                tempTicketTemplateValueList.push(
+                                  tempItem.ColItemID
+                                )
+                              } else
+                                tempTicketTemplateValueList.push(
+                                  tempItem.ColValue
+                                )
+                            }
+                          })
+                        })
+                        logger.log(
+                          'tempTicketTemplateValueList==',
+                          tempTicketTemplateValueList
+                        )
+                        vm.ticketTemplateValueList = tempTicketTemplateValueList
+                      }
+                    })
+                })
+
+                // APIManager.get('TicketTemplateInfo')
+                //   .by({
+                //     tenantID: vm.tenantID,
+                //     entityTypeID: 11,
+                //     typeID: 3,
+                //     ticketTemplateID: vm.ticketTemplateID,
+                //     colType: 2
+                //   })
+                //   .then(function(data) {
+                //     if (data.TicketTemplate.length !== 0) {
+                //       if (data.TicketTemplate[0].ColList) {
+                //         vm.ticketTemplateColTypeList = data.TicketTemplate[0].ColList.map(function(item) {
+                //           return item
+                //         })
+                //         //排除已刪除部分
+                //         vm.ticketTemplateColTypeList = vm.ticketTemplateColTypeList.filter(function(
+                //           item,
+                //           index
+                //         ) {
+                //           return item.DeleteFlag !== 'Y'
+                //         })
+                //         vm.ticketTemplateColTypeList = vm.ticketTemplateColTypeList.sort(function(a, b) {
+                //           return parseInt(a.Sort, 10) - parseInt(b.Sort, 10)
+                //         })
+                //         // logger.log('vm.ticketTemplateColTypeList',vm.ticketTemplateColTypeList)
+                //       }
+                //     }
+                //   })
+                //   .then(function() {
+                //
+                //   })
+              }
+            }
+          },
+          formData: function(newValue) {
+            const self = this
+            if (newValue) {
+              self.setFormData()
+            }
+          },
+          ticketTemplateColTypeList: {
+            handler: function(newValue) {
+              const self = this
+              // 紀錄自定義欄位的value
+              self.ticketTemplateValueList = newValue.map(function(ColType) {
+                if (ColType.TitleType === 'checkbox') {
+                  return []
+                }
+                return ColType.DefaultValue ? ColType.DefaultValue : ''
+              })
+            },
+            deep: true
+          }
+        },
+        mounted: function() {
+          const self = this
+          //英文介面Label多行UI調整
+          $('.labelcenter').each(function(index, item) {
+            countLines(item)
+          })
+
+          self.reloadTicketCategory()
+          if (!self.ticketInfo) {
+            self.reloadTicketTemplatInfo()
+          }
+          self.reloadTicketPriority()
+          self.initPersonList().then(repo => {
+            if (self.ticketInfo) {
+              self.reloadWatcher(self.ticketInfo.ticketid).then(repo => {
+                if (repo.TicketMonitor.length > 0) {
+                  self.originWatcherArray = repo.TicketMonitor
+                  repo.TicketMonitor.forEach((item, index) => {
+                    let personMappingByDBID = JSON.parse(
+                      sessionStore.read('personMappingByDBID_g')
+                    )
+                    let userName = personMappingByDBID[
+                      item.PersonID.toString()
+                    ].match(/\((.+)\)/g)
+                    // let tag = {
+                    //   name: `${personMappingByDBID[item.PersonID.toString()]}`,
+                    //   email: item.MonitorEmail,
+                    //   PersonID:item.PersonID,
+                    //   code: item.DBID
+                    // }
+                    // logger.log('tag', tag)
+                    // self.TicketWatcherModal.options.push(tag)
+                    // self.TicketWatcherModal.value.push(tag)
+
+                    let email = item.MonitorEmail
+                    if (!email) {
+                      return false
+                    }
+                    let name = userName + '(' + email + ')'
+                    const tag = {
+                      name: name,
+                      email: item.MonitorEmail,
+                      PersonID: parseInt(item.PersonID, 0),
+                      code: parseInt(item.PersonID, 0)
+                    }
+                    let findCode = self.TicketWatcherModal.options.find(
+                      element => {
+                        return element.code === tag.code
+                      }
+                    )
+                    if (!findCode) {
+                      self.TicketWatcherModal.options.push(tag)
+                    }
+                    self.TicketWatcherModal.value.push(tag)
+                    self.AddWatcherModalSubmit()
+                  })
+                }
+              })
+            }
+          })
+          if (
+            self.ticketInfo &&
+            self.ticketInfo.ticketcategoryparentid &&
+            self.ticketInfo.ticketcategoryid
+          ) {
+            self.parentTicketCategoryID = self.ticketInfo.ticketcategoryparentid
+            self.childTicketCategoryID = self.ticketInfo.ticketcategoryid
+          }
+          // console.log('this info is   ' + self.ticketInfo)
+          if (!self.ticketInfo) {
+            self.initContext()
+          }
+          if (self.formData) {
+            self.setFormData()
+          }
+          //  判斷是否為自己的暫存單
+          logger.log('self.ticketInfo', self.ticketInfo)
+          // 是暫存單的話
+          if (self.ticketInfo) {
+            if (
+              self.ticketInfo.ticketownerid !== sessionStore.read('UserID_g')
+            ) {
+              // 不屬於自己的暫存單
+              self.ticketTempOwnerStatus = false
+              logger.warn('不屬於自己的暫存單')
+              toastr.error(t('HelpDeskNew.notYourOwnTicketTemp'))
+            } else {
+              self.ticketTempOwnerStatus = true
+            }
+          }
+        },
+        methods: {
+          AddWatcherModalSubmit() {
+            const self = this
+            self.AddWatcherModal.active = false
+            self.watcherArray = self.TicketWatcherModal.value.map(item => item)
+          },
+          removeWatcher(id) {
+            const self = this
+            logger.log('personID', id)
+            self.watcherArray = self.watcherArray.filter(item => {
+              return item.PersonID !== id
+            })
+            self.TicketWatcherModal.value = self.watcherArray.filter(item => {
+              return item.PersonID !== id
+            })
+          },
+          setFormData: function() {
+            const self = this
+            Object.keys(self.formData).forEach(function(key) {
+              self[key] = self.formData[key]
+            })
+          },
+          produceUniqueName: function() {
+            let result = 'createTicketCK'
+            const num = Math.floor(Math.random() * 1000000 + 1)
+            return result + num
+          },
+          decodeURIString: function(text) {
+            try {
+              return decodeURI(text)
+            } catch (e) {
+              logger.error('檔案損毀 decodeURI', e)
+              toastr.error(t('HelpDeskNew.fileCorruption'))
+            }
+          },
+          removeTempAttachDataList(file, index) {
+            this.tempAttachDataList.splice(index, 1)
+          },
+          personName(dbid) {
+            return personMappingByDBID[parseInt(dbid, 10)]
+          },
+          entityName(dbid) {
+            return entityMapping[dbid] ? entityMapping[dbid].entitytypename : ''
+          },
+          reloadTicketCategory() {
+            let self = this
+            APIManager.get('TicketCategory')
+              .by({
+                tenantID: self.tenantID,
+                entityTypeID: 11
+              })
+              .then(function(data) {
+                data = ObjectKeysToLowerCase(data)
+                self.TicketCategory = data.ticketcategory.sort(function(a, b) {
+                  let aSort = a.sort ? parseInt(a.sort, 10) : -1
+                  let bSort = b.sort ? parseInt(b.sort, 10) : -1
+                  return aSort > bSort ? 1 : -1
+                })
+
+                //無資料室指定到第一筆
+                if (!self.ticketInfo) {
+                  self.parentTicketCategoryID =
+                    self.parentTicketCategoryList[0].dbid
+                } else {
+                  self.childTicketCategoryID = self.ticketInfo.ticketcategoryid
+                }
+              })
+          },
+          reloadTicketPriority() {
+            let self = this
+            APIManager.get('TicketPriority')
+              .by({
+                tenantID: self.tenantID,
+                entityTypeID: 11
+              })
+              .then(function(data) {
+                data = ObjectKeysToLowerCase(data)
+                self.priorityList = data.ticketpriority
+              })
+          },
+          ticketMultiSelect: function(item) {
+            let self = this
+            let tempList = []
+
+            item.ColItems.forEach(function(el, index) {
+              let param = {
+                name: item.ColItems[index].Item,
+                code: item.ColItems[index].ColItemID
+              }
+              tempList.push(param)
+            })
+            return tempList
+          },
+          reloadTicketTemplatInfo() {
+            let self = this
+            return APIManager.get('TicketTemplateInfo')
+              .by({
+                tenantID: self.tenantID,
+                entityTypeID: 11,
+                typeID: self.typeID,
+                ticketTemplateID: self.ticketTemplateID,
+                colType: 2
+              })
+              .then(function(data) {
+                self.ticketTemplateColTypeList = []
+                self.customizeBtnArray = []
+                // 回傳防呆
+                if (data.TicketTemplate.length === 0 || !data.TicketTemplate) {
+                  return false
+                }
+                if (
+                  data.TicketTemplate[0].ColList &&
+                  data.TicketTemplate[0].ColList.length > 0
+                ) {
+                  data.TicketTemplate[0].ColList.forEach(item => {
+                    if (
+                      item.TitleType !== 'postbutton' &&
+                      item.TitleType !== 'divbutton'
+                    ) {
+                      // 為自定義欄位的
+                      self.ticketTemplateColTypeList.push(item)
+                    } else {
+                      // 為按鈕的
+                      self.customizeBtnArray.push(item)
+                    }
+                  })
+                  // self.ticketTemplateColTypeList = data.TicketTemplate[0].ColList.filter(function(item) {
+                  //   return item.TitleType !== 'postbutton' && item.TitleType !== 'divbutton'
+                  // })
+                  // 刪除跟排序
+                  self.ticketTemplateColTypeList = self.ticketTemplateSort(
+                    self.ticketTemplateColTypeList
+                  )
+                  self.ticketTemplateColTypeList = self.ticketTemplateDeleteFlag(
+                    self.ticketTemplateColTypeList
+                  )
+
+                  self.customizeBtnArray = self.ticketTemplateSort(
+                    self.customizeBtnArray
+                  )
+                  self.customizeBtnArray = self.ticketTemplateDeleteFlag(
+                    self.customizeBtnArray
+                  )
+
+                  logger.log(
+                    '開新自定義欄位 self.ticketTemplateColTypeList',
+                    self.ticketTemplateColTypeList
+                  )
+                  logger.log(
+                    '開新自定義按鈕 self.customizeBtnArray',
+                    self.customizeBtnArray
+                  )
+
+                  //  customizeBtnArray
+                }
+              })
+          },
+          // 排序
+          ticketTemplateSort(array) {
+            return array.sort(function(a, b) {
+              return parseInt(a.Sort, 10) - parseInt(b.Sort, 10)
+            })
+          },
+          //排除刪除的
+          ticketTemplateDeleteFlag(array) {
+            return array.filter(function(e) {
+              return e.DeleteFlag !== 'Y'
+            })
+          },
+          radioValue(el, index) {
+            const self = this
+            const temp = JSON.parse(
+              JSON.stringify(self.ticketTemplateValueList)
+            )
+            temp[index] = el
+            self.$nextTick(function() {
+              self.ticketTemplateValueList = temp
+            })
+          },
+          checkboxValue(el, index) {
+            let self = this
+            let tempLi = self.ticketTemplateValueList[index]
+
+            if (tempLi.indexOf(el) === -1) {
+              tempLi.push(el)
+            } else if (tempLi.indexOf(el) > -1) {
+              tempLi.splice(tempLi.indexOf(el), 1)
+            }
+          },
+
+          initContext() {
+            let self = this
+            self.isLodding = false
+            self.comment = ''
+            self.priorityID = parseInt(
+              sessionStore.read('config_hd_defaultPriority_g'),
+              10
+            )
+            self.parentTicketCategoryID = -1
+            self.childTicketCategoryID = -1
+            self.endTime = ''
+            self.attachDataList = []
+            self.content = ''
+            self.subject = ''
+            self.memo = ''
+            self.alertFlag = 'N'
+            self.targetID = self.UserID
+            self.reloadTicketCategory()
+            self.reloadTicketPriority()
+          },
+          hide(reloadFlag) {
+            let self = this
+
+            self.$emit('cancel-ticket', reloadFlag)
+            self.initContext()
+          },
+
+          // 暫存 btn
+          // saveTemp() {
+          //   //驗證
+          //   let self = this
+          //   self.isDisabled = true
+          //   if (self.isLodding) {
+          //     return false
+          //   }
+          //
+          //   if (self.targetID.toString().trim().length === 0) {
+          //     toastr.error(t('HelpDeskNew.selectPersonAssign'))
+          //     self.isDisabled = false
+          //     return false
+          //   }
+          //
+          //   if (parseInt(self.childTicketCategoryID, 10) === -1) {
+          //     toastr.error(t('HelpDeskNew.checkSubclass'))
+          //     self.isDisabled = false
+          //     return false
+          //   }
+          //   if (self.priorityID === 0 || self.priorityID.length === 0) {
+          //     toastr.error(t('HelpDeskNew.selectImportantLv'))
+          //     self.isDisabled = false
+          //     return false
+          //   }
+          //   if (!self.subject || self.subject.length === 0) {
+          //     toastr.error(t('HelpDeskNew.enterCaseTheme'))
+          //     self.isDisabled = false
+          //     return false
+          //   }
+          //   if (!self.content || self.content.length === 0) {
+          //     toastr.error(t('HelpDeskNew.enterCaseSummary'))
+          //     self.isDisabled = false
+          //     return false
+          //   }
+          //
+          //   if (self.priorityID == 0) {
+          //     toastr.error(t('HelpDeskNew.selectImportantLv'))
+          //     self.isDisabled = false
+          //     return false
+          //   }
+          //   if (!uploadFileRule(self.attachDataList, self.uploadSizeLimit)) {
+          //     self.isDisabled = false
+          //     return false
+          //   }
+          //
+          //   let tempValueList = JSON.parse(JSON.stringify(self.ticketTemplateValueList))
+          //   //判斷自定義是否必填
+          //   let temptempIsRequireTitle = self.ticketTemplateColTypeList.find(function(item, index) {
+          //     if (Array.isArray(tempValueList[index])) {
+          //       if (item.IsRequire === 'Y' && tempValueList[index].length === 0) {
+          //         return true
+          //       }
+          //     } else if (item.IsRequire === 'Y' && tempValueList[index].trim().length === 0) {
+          //       return true
+          //     }
+          //   })
+          //   if (temptempIsRequireTitle) {
+          //     toastr.error(t('HelpDeskNew.pleaseEnter') + temptempIsRequireTitle.Title)
+          //     self.ticketTemplateColDataList = []
+          //     self.isDisabled = false
+          //     return false
+          //   }
+          //
+          //   //驗證 END
+          //   //客資
+          //   let ticketData = self.userData.contactdata
+          //   let ticketDataStr = JSON.stringify(ticketData)
+          //   let lowercaseTicketData = JSON.parse(ticketDataStr)
+          //   if (ticketData.contactID) {
+          //     lowercaseTicketData.contactid = ticketData.contactID
+          //     delete lowercaseTicketData.contactID
+          //   }
+          //   let lowercaseTicketDataStr = JSON.stringify(lowercaseTicketData)
+          //   //客資 END
+          //
+          //   //取得自定義欄位的value
+          //   self.ticketTemplateColTypeList.forEach(function(item, index) {
+          //     let paramItemID = ''
+          //     let paramValueList = []
+          //
+          //     if (item.TitleType == 'selectlist') {
+          //       paramItemID = []
+          //       item.ColItems.forEach(function(el, i) {
+          //         if (Array.isArray(tempValueList[index])) {
+          //           tempValueList[index].forEach(function(tempItem) {
+          //             if (el.ColItemID === tempItem.code) {
+          //               paramItemID.push(el.ColItemID)
+          //               paramValueList.push(el.Item)
+          //             }
+          //           })
+          //         }
+          //       })
+          //       paramItemID = paramItemID.join(',')
+          //
+          //       if (Array.isArray(paramValueList)) {
+          //         paramValueList = paramValueList.join(',')
+          //       }
+          //     } else if (item.TitleType == 'checkbox') {
+          //       paramItemID = []
+          //
+          //       item.ColItems.forEach(function(el, i) {
+          //         if (Array.isArray(tempValueList[index])) {
+          //           tempValueList[index].forEach(function(tempItem) {
+          //             if (el.ColItemID === tempItem) {
+          //               paramItemID.push(el.ColItemID)
+          //               paramValueList.push(el.Item)
+          //             }
+          //           })
+          //         }
+          //       })
+          //       paramItemID = paramItemID.join(',')
+          //
+          //       if (Array.isArray(paramValueList)) {
+          //         paramValueList = paramValueList.join(',')
+          //       }
+          //     } else if (item.TitleType == 'radio' || item.TitleType == 'select') {
+          //       paramItemID = ''
+          //
+          //       item.ColItems.forEach(function(el, i) {
+          //         if (el.ColItemID === tempValueList[index]) {
+          //           paramItemID = item.ColItems[i].ColItemID
+          //           paramValueList = item.ColItems[i].Item
+          //         }
+          //       })
+          //
+          //       if (Array.isArray(paramValueList)) {
+          //         paramValueList = paramValueList.join(',')
+          //       }
+          //     } else {
+          //       paramValueList = tempValueList[index]
+          //
+          //       if (Array.isArray(paramValueList)) {
+          //         paramValueList = paramValueList.join(',')
+          //       }
+          //     }
+          //     let param = {
+          //       TicketColID: item.TicketColTitleID,
+          //       Value: paramValueList,
+          //       ItemID: paramItemID
+          //     }
+          //     self.ticketTemplateColDataList.push(param)
+          //   })
+          //
+          //   self.isLodding = true
+          //   let attachDataSources = []
+          //   attachDataSources = attachDataSources.concat(
+          //     self.tempAttachDataList.map(item => {
+          //       return {
+          //         Source: item.src
+          //       }
+          //     })
+          //   )
+          //
+          //   if (self.ticketInfo) {
+          //     self.deleteTempTicket().then(function() {
+          //       if (self.attachDataList && self.attachDataList.length > 0) {
+          //         console.log(self.attachDataList)
+          //         new Uploader(self.attachDataList)
+          //           .doUpload()
+          //           .then(function(data) {
+          //             console.log(data)
+          //             data.dataList.forEach(item => {
+          //               if (item.Exist) {
+          //                 attachDataSources.push({ Source: item.src })
+          //               } else {
+          //                 let fileName = decodeURI(item.src.split('fileName=')[1])
+          //                 self.isDisabled = false
+          //                 toastr.error(fileName + ' ' + t('HelpDeskNew.uploadFailed'))
+          //               }
+          //             })
+          //             attachDataSources = JSON.stringify(attachDataSources)
+          //             self.insertTempTicket(attachDataSources, lowercaseTicketDataStr)
+          //           })
+          //           .catch(function(e) {
+          //             console.log(e)
+          //             self.isDisabled = false
+          //             toastr.error(t('HelpDeskNew.FileUploadException'))
+          //           })
+          //       } else {
+          //         attachDataSources = JSON.stringify(attachDataSources)
+          //         self.insertTempTicket(attachDataSources, lowercaseTicketDataStr)
+          //       }
+          //     })
+          //   } else {
+          //     if (self.attachDataList && self.attachDataList.length > 0) {
+          //       new Uploader(self.attachDataList)
+          //         .doUpload()
+          //         .then(function(data) {
+          //           data.dataList.forEach(item => {
+          //             if (item.Exist) {
+          //               attachDataSources.push({ Source: item.src })
+          //             } else {
+          //               let fileName = decodeURI(item.src.split('fileName=')[1])
+          //               self.isDisabled = false
+          //               toastr.error(fileName + ' ' + t('HelpDeskNew.uploadFailed'))
+          //             }
+          //           })
+          //           attachDataSources = JSON.stringify(attachDataSources)
+          //           self.insertTempTicket(attachDataSources, lowercaseTicketDataStr)
+          //         })
+          //         .catch(function(e) {
+          //           console.log(e)
+          //           self.isDisabled = false
+          //           toastr.error(t('HelpDeskNew.FileUploadException'))
+          //         })
+          //     } else {
+          //       attachDataSources = JSON.stringify(attachDataSources)
+          //       self.insertTempTicket(attachDataSources, lowercaseTicketDataStr)
+          //     }
+          //   }
+          // },
+          saveTemp() {
+            //驗證
+            let self = this
+            self.isDisabled = true
+            if (self.isLodding) {
+              return false
+            }
+
+            if (self.targetID.toString().trim().length === 0) {
+              toastr.error(t('HelpDeskNew.selectPersonAssign'))
+              self.isDisabled = false
+              return false
+            }
+
+            if (parseInt(self.childTicketCategoryID, 10) === -1) {
+              toastr.error(t('HelpDeskNew.checkSubclass'))
+              self.isDisabled = false
+              return false
+            }
+            if (self.priorityID === 0 || self.priorityID.length === 0) {
+              toastr.error(t('HelpDeskNew.selectImportantLv'))
+              self.isDisabled = false
+              return false
+            }
+            if (!self.subject || self.subject.length === 0) {
+              toastr.error(t('HelpDeskNew.enterCaseTheme'))
+              self.isDisabled = false
+              return false
+            }
+            // if (!self.content || self.content.length === 0) {
+            //   toastr.error(t('HelpDeskNew.enterCaseSummary'))
+            //   self.isDisabled = false
+            //   return false
+            // }
+
+            if (self.priorityID == 0) {
+              toastr.error(t('HelpDeskNew.selectImportantLv'))
+              self.isDisabled = false
+              return false
+            }
+            if (!uploadFileRule(self.attachDataList, self.uploadSizeLimit)) {
+              self.isDisabled = false
+              return false
+            }
+
+            let tempValueList = JSON.parse(
+              JSON.stringify(self.ticketTemplateValueList)
+            )
+            //判斷自定義是否必填
+            let temptempIsRequireTitle = self.ticketTemplateColTypeList.find(
+              function(item, index) {
+                if (Array.isArray(tempValueList[index])) {
+                  if (
+                    item.IsRequire === 'Y' &&
+                    tempValueList[index].length === 0
+                  ) {
+                    return true
+                  }
+                } else if (
+                  item.IsRequire === 'Y' &&
+                  tempValueList[index].trim().length === 0
+                ) {
+                  return true
+                }
+              }
+            )
+            if (temptempIsRequireTitle) {
+              toastr.error(
+                t('HelpDeskNew.pleaseEnter') + temptempIsRequireTitle.Title
+              )
+              self.ticketTemplateColDataList = []
+              self.isDisabled = false
+              return false
+            }
+
+            //驗證 END
+            //客資
+            let ticketData = self.userData.contactdata
+            let ticketDataStr = JSON.stringify(ticketData)
+            let lowercaseTicketData = JSON.parse(ticketDataStr)
+            if (ticketData.contactID) {
+              lowercaseTicketData.contactid = ticketData.contactID
+              delete lowercaseTicketData.contactID
+            }
+            let lowercaseTicketDataStr = JSON.stringify(lowercaseTicketData)
+            //客資 END
+
+            //取得自定義欄位的value
+            self.ticketTemplateColTypeList.forEach(function(item, index) {
+              let paramItemID = ''
+              let paramValueList = []
+
+              if (item.TitleType == 'selectlist') {
+                paramItemID = []
+                item.ColItems.forEach(function(el, i) {
+                  if (Array.isArray(tempValueList[index])) {
+                    tempValueList[index].forEach(function(tempItem) {
+                      if (el.ColItemID === tempItem.code) {
+                        paramItemID.push(el.ColItemID)
+                        paramValueList.push(el.Item)
+                      }
+                    })
+                  }
+                })
+                paramItemID = paramItemID.join(',')
+
+                if (Array.isArray(paramValueList)) {
+                  paramValueList = paramValueList.join(',')
+                }
+              } else if (item.TitleType == 'checkbox') {
+                paramItemID = []
+
+                item.ColItems.forEach(function(el, i) {
+                  if (Array.isArray(tempValueList[index])) {
+                    tempValueList[index].forEach(function(tempItem) {
+                      if (el.ColItemID === tempItem) {
+                        paramItemID.push(el.ColItemID)
+                        paramValueList.push(el.Item)
+                      }
+                    })
+                  }
+                })
+                paramItemID = paramItemID.join(',')
+
+                if (Array.isArray(paramValueList)) {
+                  paramValueList = paramValueList.join(',')
+                }
+              } else if (
+                item.TitleType == 'radio' ||
+                item.TitleType == 'select'
+              ) {
+                paramItemID = ''
+
+                item.ColItems.forEach(function(el, i) {
+                  if (el.ColItemID === tempValueList[index]) {
+                    paramItemID = item.ColItems[i].ColItemID
+                    paramValueList = item.ColItems[i].Item
+                  }
+                })
+
+                if (Array.isArray(paramValueList)) {
+                  paramValueList = paramValueList.join(',')
+                }
+              } else {
+                paramValueList = tempValueList[index]
+
+                if (Array.isArray(paramValueList)) {
+                  paramValueList = paramValueList.join(',')
+                }
+              }
+              let param = {
+                TicketColID: item.TicketColTitleID,
+                Value: paramValueList,
+                ItemID: paramItemID
+              }
+              self.ticketTemplateColDataList.push(param)
+            })
+
+            self.isLodding = true
+            let attachDataSources = []
+            attachDataSources = attachDataSources.concat(
+              self.tempAttachDataList.map(item => {
+                return {
+                  Source: item.src
+                }
+              })
+            )
+
+            if (self.ticketInfo) {
+              if (self.attachDataList && self.attachDataList.length > 0) {
+                logger.log(self.attachDataList)
+                new Uploader(self.attachDataList)
+                  .doUpload()
+                  .then(function(data) {
+                    logger.log(data)
+                    data.dataList.forEach(item => {
+                      if (item.Exist) {
+                        attachDataSources.push({ Source: item.src })
+                      } else {
+                        let fileName = decodeURI(item.src.split('fileName=')[1])
+                        self.isDisabled = false
+                        toastr.error(
+                          fileName + ' ' + t('HelpDeskNew.uploadFailed')
+                        )
+                      }
+                    })
+                    attachDataSources = JSON.stringify(attachDataSources)
+                    self.insertTempTicket(
+                      attachDataSources,
+                      lowercaseTicketDataStr
+                    )
+                  })
+                  .catch(function(e) {
+                    logger.warn('檔案上傳異常', e)
+                    self.isDisabled = false
+                    toastr.error(t('HelpDeskNew.FileUploadException'))
+                  })
+              } else {
+                attachDataSources = JSON.stringify(attachDataSources)
+                self.insertTempTicket(attachDataSources, lowercaseTicketDataStr)
+              }
+            } else {
+              if (self.attachDataList && self.attachDataList.length > 0) {
+                new Uploader(self.attachDataList)
+                  .doUpload()
+                  .then(function(data) {
+                    data.dataList.forEach(item => {
+                      if (item.Exist) {
+                        attachDataSources.push({ Source: item.src })
+                      } else {
+                        let fileName = decodeURI(item.src.split('fileName=')[1])
+                        self.isDisabled = false
+                        toastr.error(
+                          fileName + ' ' + t('HelpDeskNew.uploadFailed')
+                        )
+                      }
+                    })
+                    attachDataSources = JSON.stringify(attachDataSources)
+                    self.createTempTicket(
+                      attachDataSources,
+                      lowercaseTicketDataStr
+                    )
+                  })
+                  .catch(function(e) {
+                    logger.warn('檔案上傳異常', e)
+                    self.isDisabled = false
+                    toastr.error(t('HelpDeskNew.FileUploadException'))
+                  })
+              } else {
+                attachDataSources = JSON.stringify(attachDataSources)
+                self.createTempTicket(attachDataSources, lowercaseTicketDataStr)
+              }
+            }
+          },
+          deleteTemp: function() {
+            let self = this
+            self.deleteTempTicket().then(function() {
+              toastr.success(t('HelpDeskNew.DeleteSuccess'))
+              self.hide(true)
+            })
+          },
+          // 送出 btn
+          send() {
+            let self = this
+            self.isDisabled = true
+            //驗證
+            if (self.isLodding) {
+              return false
+            }
+
+            if (self.targetID.toString().trim().length === 0) {
+              toastr.error(t('HelpDeskNew.selectPersonAssign'))
+              self.isDisabled = false
+              return false
+            }
+
+            if (parseInt(self.childTicketCategoryID, 10) === -1) {
+              toastr.error(t('HelpDeskNew.checkSubclass'))
+              self.isDisabled = false
+              return false
+            }
+            if (self.priorityID === 0 || self.priorityID.length === 0) {
+              toastr.error(t('HelpDeskNew.selectImportantLv'))
+              self.isDisabled = false
+              return false
+            }
+            if (!self.subject || self.subject.length === 0) {
+              toastr.error(t('HelpDeskNew.enterCaseTheme'))
+              self.isDisabled = false
+              return false
+            }
+            if (!self.content || self.content.length === 0) {
+              toastr.error(t('HelpDeskNew.enterCaseSummary'))
+              self.isDisabled = false
+              return false
+            }
+
+            if (self.priorityID == 0) {
+              toastr.error(t('HelpDeskNew.selectImportantLv'))
+              self.isDisabled = false
+              return false
+            }
+            if (!uploadFileRule(self.attachDataList, self.uploadSizeLimit)) {
+              self.isDisabled = false
+              return false
+            }
+
+            let tempValueList = JSON.parse(
+              JSON.stringify(self.ticketTemplateValueList)
+            )
+            //判斷自定義是否必填
+            let temptempIsRequireTitle = self.ticketTemplateColTypeList.find(
+              function(item, index) {
+                if (Array.isArray(tempValueList[index])) {
+                  if (
+                    item.IsRequire === 'Y' &&
+                    tempValueList[index].length === 0
+                  ) {
+                    return true
+                  }
+                } else if (
+                  item.IsRequire === 'Y' &&
+                  tempValueList[index].trim().length === 0
+                ) {
+                  return true
+                }
+              }
+            )
+            if (temptempIsRequireTitle) {
+              self.isDisabled = false
+              toastr.error(
+                t('HelpDeskNew.pleaseEnter') + temptempIsRequireTitle.Title
+              )
+              self.ticketTemplateColDataList = []
+              self.isDisabled = false
+              return false
+            }
+
+            //驗證 END
+            //客資
+            let ticketData = self.userData.contactdata
+            let ticketDataStr = JSON.stringify(ticketData)
+            let lowercaseTicketData = JSON.parse(ticketDataStr)
+            if (ticketData.contactID) {
+              lowercaseTicketData.contactid = ticketData.contactID
+              delete lowercaseTicketData.contactID
+            }
+            let lowercaseTicketDataStr = JSON.stringify(lowercaseTicketData)
+            //客資 END
+            self.isLodding = true
+            let attachDataSources = []
+            attachDataSources = attachDataSources.concat(
+              self.tempAttachDataList.map(item => {
+                return {
+                  Source: item.src
+                }
+              })
+            )
+
+            //取得自定義欄位的value
+            self.ticketTemplateColTypeList.forEach(function(item, index) {
+              let paramItemID = ''
+              let paramValueList = []
+
+              if (item.TitleType == 'selectlist') {
+                paramItemID = []
+                item.ColItems.forEach(function(el, i) {
+                  if (Array.isArray(tempValueList[index])) {
+                    tempValueList[index].forEach(function(tempItem) {
+                      if (el.ColItemID === tempItem.code) {
+                        paramItemID.push(el.ColItemID)
+                        paramValueList.push(el.Item)
+                      }
+                    })
+                  }
+                })
+                paramItemID = paramItemID.join(',')
+
+                if (Array.isArray(paramValueList)) {
+                  paramValueList = paramValueList.join(',')
+                }
+              } else if (item.TitleType == 'checkbox') {
+                paramItemID = []
+
+                item.ColItems.forEach(function(el, i) {
+                  if (Array.isArray(tempValueList[index])) {
+                    tempValueList[index].forEach(function(tempItem) {
+                      if (el.ColItemID === tempItem) {
+                        paramItemID.push(el.ColItemID)
+                        paramValueList.push(el.Item)
+                      }
+                    })
+                  }
+                })
+                paramItemID = paramItemID.join(',')
+
+                if (Array.isArray(paramValueList)) {
+                  paramValueList = paramValueList.join(',')
+                }
+              } else if (
+                item.TitleType == 'radio' ||
+                item.TitleType == 'select'
+              ) {
+                paramItemID = ''
+
+                item.ColItems.forEach(function(el, i) {
+                  if (el.ColItemID === tempValueList[index]) {
+                    paramItemID = item.ColItems[i].ColItemID
+                    paramValueList = item.ColItems[i].Item
+                  }
+                })
+
+                if (Array.isArray(paramValueList)) {
+                  paramValueList = paramValueList.join(',')
+                }
+              } else {
+                paramValueList = tempValueList[index]
+
+                if (Array.isArray(paramValueList)) {
+                  paramValueList = paramValueList.join(',')
+                }
+              }
+              let param = {
+                TicketColID: item.TicketColTitleID,
+                Value: paramValueList,
+                ItemID: paramItemID
+              }
+              self.ticketTemplateColDataList.push(param)
+            })
+            if (self.ticketInfo) {
+              // self.deleteTempTicket().then(function() {
+              if (self.attachDataList && self.attachDataList.length > 0) {
+                new Uploader(self.attachDataList)
+                  .doUpload()
+                  .then(function(data) {
+                    data.dataList.forEach(item => {
+                      if (item.Exist) {
+                        attachDataSources.push({ Source: item.src })
+                      } else {
+                        let fileName = decodeURI(item.src.split('fileName=')[1])
+                        self.isDisabled = false
+                        toastr.error(
+                          fileName + ' ' + t('HelpDeskNew.uploadFailed')
+                        )
+                      }
+                    })
+                    attachDataSources = JSON.stringify(attachDataSources)
+                    self.insertTicket(attachDataSources, lowercaseTicketDataStr)
+                  })
+                  .catch(function(e) {
+                    logger.warn('檔案上傳異常', e)
+                    self.isDisabled = false
+                    toastr.error(t('HelpDeskNew.FileUploadException'))
+                  })
+              } else {
+                attachDataSources = JSON.stringify(attachDataSources)
+                self.insertTicket(attachDataSources, lowercaseTicketDataStr)
+              }
+              // })
+            } else {
+              if (self.attachDataList && self.attachDataList.length > 0) {
+                new Uploader(self.attachDataList)
+                  .doUpload()
+                  .then(function(data) {
+                    data.dataList.forEach(item => {
+                      if (item.Exist) {
+                        attachDataSources.push({ Source: item.src })
+                      } else {
+                        let fileName = decodeURI(item.src.split('fileName=')[1])
+                        self.isDisabled = false
+                        toastr.error(
+                          fileName + ' ' + t('HelpDeskNew.uploadFailed')
+                        )
+                      }
+                    })
+                    attachDataSources = JSON.stringify(attachDataSources)
+                    self.insertTicket(attachDataSources, lowercaseTicketDataStr)
+                  })
+                  .catch(function(e) {
+                    logger.warn('上傳檔案異常', e)
+                    self.isDisabled = false
+                    toastr.error(t('HelpDeskNew.FileUploadException'))
+                  })
+              } else {
+                attachDataSources = JSON.stringify(attachDataSources)
+                self.insertTicket(attachDataSources, lowercaseTicketDataStr)
+              }
+            }
+          },
+          // 新增監看者 (因應特力屋專案有修改參數)
+          insertTicketMonitor(ticketMonitorList) {
+            const self = this
+            let param = {
+              tenantID: self.tenantID,
+              entityTypeID: 11,
+              ticketMonitorList: ticketMonitorList,
+              createPersonID: sessionStore.read('UserID_g'),
+              replyType: 'Monitor',
+              language: sessionStore.read('language_g')
+            }
+            return APIManager.insert('TicketMonitor').by(param)
+          },
+          UpdateTicket() {
+            //  再次暫存更新ㄉ
+          },
+          UpdateTicketContent() {
+            //  再次暫存更新ㄉ
+          },
+          insertTicket: function(attachDataSources, lowercaseTicketDataStr) {
+            let self = this
+
+            let param = {
+              reqPersonID: self.UserID,
+              ticketTemplateID: self.ticketTemplateID,
+              ticketCategoryID: self.childTicketCategoryID,
+              endTime: self.endTime,
+              priorityID: self.priorityID,
+              memo: self.memo ? self.memo : '',
+              subject: self.subject,
+              content: self.content,
+              alertFlag: self.alertFlag,
+              attachDataSources: attachDataSources,
+              ticketData: lowercaseTicketDataStr,
+              tenantID: self.tenantID,
+              targetID: self.targetID,
+              interactionDBID: self.ixnDBID,
+              orderType: 'PERSON',
+              entityTypeID: 11,
+              colData: JSON.stringify(self.ticketTemplateColDataList)
+            }
+            if (self.ticketInfo) {
+              param.ticketID = self.ticketInfo.ticketid
+            }
+            logger.log('send', param)
+            // if ('ticketid' in self.ticketInfo) {
+            //   param.ticketID = self.ticketInfo.ticketid
+            // }
+            return APIManager.insert('Ticket')
+              .by(param)
+              .then(function(data) {
+                data = ObjectKeysToLowerCase(data)
+                let ticketID = data.createticket[0].ticketid
+
+                // 新增監看者
+                self.updateTicketMonitor(ticketID)
+                toastr.success(t('HelpDeskNew.openingNewCaseNumber') + ticketID)
+                self.hide(true)
+              })
+              .finally(function() {
+                self.isLodding = false
+                self.attachDataList = []
+                self.isDisabled = false
+              })
+          },
+          createTempTicket: function(
+            attachDataSources,
+            lowercaseTicketDataStr
+          ) {
+            let self = this
+            // 暫存 param
+            let param = {
+              reqPersonID: self.UserID,
+              ticketTemplateID: self.ticketTemplateID,
+              ticketCategoryID: self.childTicketCategoryID,
+              endTime: self.endTime,
+              priorityID: self.priorityID,
+              memo: self.memo ? self.memo : '',
+              subject: self.subject,
+              content: self.content,
+              alertFlag: self.alertFlag,
+              attachDataSources: attachDataSources,
+              ticketData: lowercaseTicketDataStr,
+              tenantID: self.tenantID,
+              targetID: self.targetID,
+              interactionDBID: self.ixnDBID,
+              orderType: 'PERSON',
+              entityTypeID: 11,
+              colData: JSON.stringify(self.ticketTemplateColDataList)
+            }
+            logger.log('createTemp', param)
+            APIManager.insert('CreateTempTicket')
+              .by(param)
+              .then(function(data) {
+                data = ObjectKeysToLowerCase(data)
+                let ticketID = data.createtempticket[0].ticketid
+                // 新增監看者
+                if (self.watcherArray.length > 0) {
+                  let ticketMonitorList = []
+                  self.TicketWatcherModal.value.forEach(function(item) {
+                    let email = item.email.trim()
+                    let temp = {
+                      TicketID: ticketID,
+                      MonitorEmail: email
+                    }
+                    if (item.PersonID) {
+                      temp.PersonID = item.PersonID
+                    }
+                    ticketMonitorList.push(temp)
+                  })
+                  ticketMonitorList = JSON.stringify(ticketMonitorList)
+                  logger.log('ticketMonitorList', ticketMonitorList)
+                  self.insertTicketMonitor(ticketMonitorList)
+                }
+                toastr.success(t('HelpDeskNew.temporaryCaseSuccess') + ticketID)
+                self.hide(true)
+              })
+              .finally(function() {
+                self.isLodding = false
+                self.attachDataList = []
+                self.isDisabled = false
+              })
+          },
+          insertTempTicket: function(
+            attachDataSources,
+            lowercaseTicketDataStr
+          ) {
+            let self = this
+            // 暫存 param
+            let param = {
+              reqPersonID: self.UserID,
+              ticketTemplateID: self.ticketTemplateID,
+              ticketCategoryID: self.childTicketCategoryID,
+              endTime: self.endTime,
+              priorityID: self.priorityID,
+              memo: self.memo ? self.memo : '',
+              subject: self.subject,
+              content: self.content,
+              alertFlag: self.alertFlag,
+              attachDataSources: attachDataSources,
+              ticketData: lowercaseTicketDataStr,
+              tenantID: self.tenantID,
+              targetID: self.targetID,
+              interactionDBID: self.ixnDBID,
+              orderType: 'PERSON',
+              entityTypeID: 11,
+              colData: JSON.stringify(self.ticketTemplateColDataList)
+            }
+            if (self.ticketInfo) {
+              param.ticketID = self.ticketInfo.ticketid
+            }
+            logger.log('insertTemp', param)
+            APIManager.insert('TempTicket')
+              .by(param)
+              .then(function(data) {
+                data = ObjectKeysToLowerCase(data)
+                let ticketID = data.ticketjsonstr.dbid
+                self.updateTicketMonitor(ticketID)
+
+                toastr.success(t('HelpDeskNew.temporaryCaseSuccess') + ticketID)
+                self.hide(true)
+              })
+              .finally(function() {
+                self.isLodding = false
+                self.attachDataList = []
+                self.isDisabled = false
+              })
+          },
+          updateTicketMonitor(ticketID) {
+            const self = this
+            // 監看者 若是已存在後來更新不存在的的要先刪掉
+            if (self.originWatcherArray.length > 0) {
+              // 刪除陣列
+              let deleteMonitorIDs = []
+              let ticketMonitorList = []
+              if (self.watcherArray.length > 0) {
+                logger.log('self.watcherArray', self.watcherArray)
+                self.watcherArray.forEach(item => {
+                  let findTemp = self.originWatcherArray.find(originItem => {
+                    return originItem.DBID === item.code
+                  })
+                  if (!findTemp) {
+                    let email = item.email.trim()
+                    let temp = {
+                      TicketID: ticketID,
+                      MonitorEmail: email
+                    }
+                    if (item.PersonID) {
+                      temp.PersonID = item.PersonID
+                    }
+                    ticketMonitorList.push(temp)
+                  }
+                })
+                logger.log('self.originWatcherArray', self.originWatcherArray)
+                self.originWatcherArray.forEach(item => {
+                  let findTemp = self.watcherArray.find(watcherItem => {
+                    return watcherItem.code === item.DBID
+                  })
+                  logger.log('findTemp', findTemp)
+                  if (!findTemp) {
+                    deleteMonitorIDs.push(item.DBID)
+                  }
+                })
+                logger.log('deleteMonitorIDs', deleteMonitorIDs)
+                //  若刪除有先刪除
+                if (deleteMonitorIDs.length > 0) {
+                  self
+                    .deleteTicketMonitor(deleteMonitorIDs, ticketID)
+                    .then(repo => {
+                      if (ticketMonitorList.length > 0) {
+                        ticketMonitorList = JSON.stringify(ticketMonitorList)
+                        self.insertTicketMonitor(ticketMonitorList)
+                      }
+                    })
+                } else {
+                  if (ticketMonitorList.length > 0) {
+                    ticketMonitorList = JSON.stringify(ticketMonitorList)
+                    self.insertTicketMonitor(ticketMonitorList)
+                  }
+                }
+              } else {
+                self.originWatcherArray.forEach(item => {
+                  deleteMonitorIDs.push(item.DBID)
+                  self.deleteTicketMonitor(deleteMonitorIDs, ticketID)
+                })
+              }
+            } else {
+              // 原本沒有直接新增
+              if (self.watcherArray.length > 0) {
+                let ticketMonitorList = []
+                self.TicketWatcherModal.value.forEach(function(item) {
+                  let email = item.email.trim()
+                  let temp = {
+                    TicketID: ticketID,
+                    MonitorEmail: email
+                  }
+                  if (item.PersonID) {
+                    temp.PersonID = item.PersonID
+                  }
+                  ticketMonitorList.push(temp)
+                })
+                ticketMonitorList = JSON.stringify(ticketMonitorList)
+                logger.log('ticketMonitorList', ticketMonitorList)
+                self.insertTicketMonitor(ticketMonitorList)
+              }
+            }
+          },
+          // 刪除監看者 (因應特力屋專案有修改參數)
+          deleteTicketMonitor(ticketMonitorIDs, ticketID) {
+            logger.log('ticketMonitorIDs', ticketMonitorIDs)
+            const self = this
+            return APIManager.delete('TicketMonitor').by({
+              tenantID: 3,
+              entityTypeID: 11,
+              ticketMonitorIDs: JSON.stringify(ticketMonitorIDs),
+              ticketID: ticketID,
+              createPersonID: sessionStore.read('UserID_g'),
+              replyType: 'Monitor',
+              language: sessionStore.read('language_g')
+            })
+          },
+          deleteTempTicket: function() {
+            let self = this
+            let param = {
+              tenantID: self.tenantID,
+              entityTypeID: 11,
+              ticketID: self.ticketInfo.ticketid
+            }
+            return APIManager.delete('TempTicket')
+              .by(param)
+              .finally(function() {})
+          },
+          initPersonList: function() {
+            let self = this
+            return APIManager.get('PersonByState')
+              .by({ tenantID: self.tenantID })
+              .then(function(data) {
+                self.personList = data.person
+                self.personList.forEach(function(item, index, array) {
+                  let userName = item.USER_NAME
+                  let email = item.EMAILADDRESS
+                  if (!email) {
+                    return false
+                  }
+                  let name = userName + '(' + email + ')'
+                  const tag = {
+                    name: name,
+                    email: item.EMAILADDRESS,
+                    PersonID: item.DBID,
+                    code: item.DBID
+                  }
+                  self.TicketWatcherModal.options.push(tag)
+                })
+              })
+          },
+          addTag(newTag) {
+            let self = this
+            if (!self.mailReg.test(newTag.trim().toLowerCase())) {
+              toastr.error(t('HelpDeskNew.emailIncorrect'))
+              return
+            }
+            const tag = {
+              name: newTag,
+              email: newTag,
+              code: newTag
+            }
+            self.TicketWatcherModal.options.push(tag)
+            self.TicketWatcherModal.value.push(tag)
+          },
+          reloadWatcher(ticketID) {
+            const self = this
+            return APIManager.get('TicketMonitor').by({
+              tenantID: 3,
+              entityTypeID: 11,
+              ticketID: ticketID
+            })
+          }
+        }
+      })
+
+
+/* 
+      insertTicketParents: function(childTicketID) {
+      let self = this
+      let ticketParentsList = [
+        {
+          ticketID: self.ticketID,
+          childTicketID: childTicketID
+        }
+      ]
+      ticketParentsList = JSON.stringify(ticketParentsList)
+      let param = {
+        ticketParentsList: ticketParentsList,
+        ticketID: self.ticketID,
+        createPersonID: sessionStore.read('UserID_g'),
+        replyType: 'Parents',
+        language: sessionStore.read('language_g')
+      }
+      return APIManager.insert('TicketParents')
+        .by(param)
+        .finally(function() {})
+    }
+
+insertTicketOtherAPI(attachDataSources, lowercaseTicketDataStr, apiURL){
+      const self = this
+      let param = {
+        reqPersonID: self.UserID,
+        ticketTemplateID: self.ticketTemplateID,
+        ticketCategoryID: self.childTicketCategoryID,
+        endTime: self.endTime,
+        priorityID: self.priorityID,
+        memo: self.memo ? self.memo : '',
+        subject: self.subject,
+        content: self.content,
+        alertFlag: self.alertFlag,
+        attachDataSources: attachDataSources,
+        ticketData: lowercaseTicketDataStr,
+        tenantID: self.tenantID,
+        targetID: self.targetID,
+        interactionDBID: self.ixnDBID,
+        orderType: 'PERSON',
+        entityTypeID: 11,
+        colData: JSON.stringify(self.ticketTemplateColDataList)
+      }
+      if (self.ticketInfo) {
+        param.ticketID = self.ticketInfo.ticketid
+      }
+      logger.log('send', param)
+
+      return $.ajax({
+        method: 'POST',
+        url: apiURL.toString(),
+        data: param
+      }).done((data)=>{
+
+        data = ObjectKeysToLowerCase(JSON.parse(data))
+        logger.log('insertTicketOtherAPI repo',data)
+        // 判斷是否成功 returncode後3碼為000就判斷成功
+        if (data.returncode.substr(data.returncode.length-3) === '000'){
+          let ticketID = data.createticket[0].ticketid
+          // 新增監看者
+          self.updateTicketMonitor(ticketID)
+          toastr.success(t('HelpDeskNew.openingNewCaseNumber') + ticketID)
+          self.hide(true)
+        }else {
+          toastr.success(data.returnMsg)
+          logger.error(`api ${apiURL}`,data.returnMsg)
+          self.isLodding = false
+          self.attachDataList = []
+          self.isDisabled = false
+        }
+
+      }).fail((e)=>{
+        logger.error(`api ${apiURL}`,e)
+      }).always(()=>{
+        self.isLodding = false
+        self.attachDataList = []
+        self.isDisabled = false
+      })
+    },
+    
+*/
+    </script>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <div @click.stop="add('1')">
+        <input type="checkbox" v-model="group" value="1" /><label
+          >我是複選框 1</label
+        >
+      </div>
+      <div @click.stop="add('2')">
+        <input type="checkbox" v-model="group" value="2" /><label
+          >我是複選框 2</label
+        >
+      </div>
+
+      <div @click.stop="add('3')">
+        <input type="checkbox" v-model="group" value="3" /><label
+          >我是複選框 3</label
+        >
+      </div>
+
+      <div>{{ group }}</div>
+    </div>
+    <script>
+      var vm = new Vue({
+        el: '#app',
+        data: {
+          group: []
+        },
+        methods: {
+          add(data) {
+              console.log(data)
+            const self = this
+            let findIndex = self.group.findIndex(element=>{
+                return parseInt(data,10) === parseInt(element,10)
+            })
+            if(findIndex !== -1){
+                self.group.splice(findIndex,1)
+            }else{
+                self.group.push(data)
+            }
+          }
+        }
+      })
+    </script>
+  </body>
+</html>

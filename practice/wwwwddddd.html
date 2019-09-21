@@ -6,59 +6,139 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
   </head>
-
   <body>
-    <h1>this is index</h1>
-    <iframe
-      id="myframe"
-      src="https://rd-dev.onead.tw/test_demo/2019/0726/iframPage.html"
-      frameborder="0"
-    ></iframe>
-    <!-- <iframe id="myframe" src="./iframPage.html" frameborder="0"></iframe> -->
-    <br /><br />
-    <input type="text" id="message" /><input
-      type="button"
-      value=""
-      onclick="sendIt()"
-    />
     <script>
-      let oW = document.body.offsetWidth
-      console.log('視窗寬度:', oW)
-      // idnex.html
-      //獲取iframe元素
-      iFrame = document.getElementById('myframe')
-      //iframe加載完畢後再發送消息，否則子頁面接收不到message
-      iFrame.onload = function() {
-        //iframe加載完立即發送一條消息
-        iFrame.contentWindow.postMessage(oW, '*')
+      function getObjectKeyLength(param) {
+        if (!Array.isArray(param) && typeof param === 'object') {
+          return Object.keys(param).length
+        } else {
+          logger.warn(`function getObjectKeyLength (param's not a object)`)
+          return param
+        }
       }
-      function myfunction() {
-        funcA(funcB)
-      }
+      // (function(console){
+      var logs = {}
+      var logger = {
+        fontSize: '15',
+        option: {
+          isEnabled: false
+        },
+        log: function(content = '', value = '') {
+          const self = this
+          console.log(
+            '%c[log]',
+            `color: black;font-size:${self.fontSize}px`,
+            content,
+            value
+          )
+          let count = getObjectKeyLength(logs)
+          // logs[new Date() + ' ' + count] = content + ' ' + value
+          // logs[new Date() + ' ' + count] = content
+          logs[new Date() + ' ' + content] = value
+        },
+        info: function(content = '', value = '') {
+          const self = this
+          console.log(
+            '%c[info]',
+            `color: blue;font-size:${self.fontSize}px;background-color:lightblue;`,
+            content,
+            value
+          )
+        },
+        warn: function(content = '', value = '') {
+          const self = this
+          console.warn(
+            '%c[warn] ' +
+              (typeof content === 'object' ? JSON.stringify(content) : content),
+            `color: goldenrod;font-size:${self.fontSize}px;`,
+            value
+          )
+          // console.warn("%c[info]", `color: goldenrod;font-size:${self.fontSize}px;`, content, value)
+        },
+        error: function(content = '', value = '') {
+          const self = this
 
-      function funcA(callback) {
-        window.setTimeout(function() {
-          console.log('fistt function finished')
-          if (typeof callback == 'function') {
-            callback()
+          console.error(
+            '%c[error] ' +
+              (typeof content === 'object' ? JSON.stringify(content) : content),
+            `color: red;font-size:${self.fontSize}px`,
+            value
+          )
+        },
+        save: function(data, filename) {
+          const self = this
+          if (!data) {
+            console.error('Console.save: No data')
+            return
           }
-        }, 100)
-      }
 
-      function funcB() {
-        setTimeout(function() {
-          //傳送高度
-          let cH = document.body.clientHeight
-          console.log('視窗高度', cH)
-          //iframe加載完畢後再發送消息，否則子頁面接收不到message
-          iFrame.onload = function() {
-            //iframe加載完立即發送一條消息
-            iFrame.contentWindow.postMessage(cH, '*')
+          if (!filename) filename = 'console.json'
+
+          if (typeof data === 'object') {
+            data = JSON.stringify(data, undefined, 4)
           }
-        }, 5000)
-      }
 
-      window.addEventListener('load', myfunction)
+          var blob = new Blob([data], { type: 'text/json' }),
+            e = document.createEvent('MouseEvents'),
+            a = document.createElement('a')
+
+          console.log(blob)
+        }
+      }
+      var ggg = {
+        a: 0,
+        b: 1,
+        c: 2
+      }
+      logger.log('a', 1)
+      logger.log('b', 2)
+      logger.log('c', 3)
+      logger.log('d', logger.option)
+      logger.log('e', 5)
+
+      console.save = function(data, filename) {
+        if (!data) {
+          console.error('Console.save: No data')
+          return
+        }
+
+        if (!filename) filename = 'console.json'
+
+        if (typeof data === 'object') {
+          data = JSON.stringify(data, undefined, 4)
+        }
+
+        var blob = new Blob([data], { type: 'text/json' }),
+          e = document.createEvent('MouseEvents'),
+          a = document.createElement('a')
+
+        console.log(blob)
+
+        a.download = filename
+        a.href = window.URL.createObjectURL(blob)
+        a.dataset.downloadurl = ['text/json', a.download, a.href].join(':')
+        e.initMouseEvent(
+          'click',
+          true,
+          false,
+          window,
+          0,
+          0,
+          0,
+          0,
+          0,
+          false,
+          false,
+          false,
+          false,
+          0,
+          null
+        )
+        a.dispatchEvent(e)
+      }
+      // })(console)
+
+      // console.save(logs)
     </script>
   </body>
 </html>
